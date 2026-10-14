@@ -1,5 +1,7 @@
-// Sound effects synthesised with the Web Audio API, so there are no files to load.
-// Browsers only allow sound after a tap, and every effect here follows one.
+// Sound effects: a recorded cash-register "cha-ching" for sales, the rest synthesised
+// with the Web Audio API. Browsers only allow sound after a tap, and every effect here follows one.
+// The recording is inlined into the bundle (25 KB) so it works in the single-file Artifact build too.
+import chaChingUrl from '../assets/cha-ching.mp3?inline';
 
 let ctx = null;
 let enabled = true;
@@ -35,31 +37,30 @@ function note(ac, { freq, to, type = 'sine', at = 0, dur = 0.15, vol = 0.2 }) {
   osc.stop(t + dur + 0.02);
 }
 
-// A short burst of filtered noise: the mechanical "cha" of a cash register drawer.
-function cha(ac, at = 0) {
-  const t = ac.currentTime + at;
-  const buf = ac.createBuffer(1, Math.floor(ac.sampleRate * 0.09), ac.sampleRate);
-  const data = buf.getChannelData(0);
-  for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length) ** 2;
-  const src = ac.createBufferSource();
-  const filter = ac.createBiquadFilter();
-  const gain = ac.createGain();
-  src.buffer = buf;
-  filter.type = 'bandpass';
-  filter.frequency.value = 3500;
-  filter.Q.value = 0.8;
-  gain.gain.value = 0.5;
-  src.connect(filter).connect(gain).connect(ac.destination);
-  src.start(t);
+// Decode the recording once, the first time a sound plays.
+let chaChing = null;
+function loadChaChing(ac) {
+  // Decode the base64 data URL by hand: an Artifact page may not fetch() data: URLs.
+  chaChing ??= Promise.resolve()
+    .then(() => {
+      const bin = atob(chaChingUrl.slice(chaChingUrl.indexOf(',') + 1));
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return ac.decodeAudioData(bytes.buffer);
+    })
+    .catch(() => null);
+  return chaChing;
 }
 
-// A bell "ching": a few inharmonic partials with a long ring, like the register's bell.
-function ching(ac, freq, at = 0, vol = 0.16) {
-  [
-    [1, 1],
-    [2.76, 0.5],
-    [5.4, 0.25],
-  ].forEach(([ratio, level]) => note(ac, { freq: freq * ratio, type: 'sine', at, dur: 0.9, vol: vol * level }));
+async function playRecording(ac, bufferPromise, vol = 0.9) {
+  const buffer = await bufferPromise;
+  if (!buffer) return;
+  const src = ac.createBufferSource();
+  const gain = ac.createGain();
+  src.buffer = buffer;
+  gain.gain.value = vol;
+  src.connect(gain).connect(ac.destination);
+  src.start();
 }
 
 const play = (fn) => () => {
@@ -72,12 +73,9 @@ export const sfx = {
   bidUp: play((ac) => note(ac, { freq: 600, to: 900, type: 'square', dur: 0.08, vol: 0.06 })),
   bidDown: play((ac) => note(ac, { freq: 700, to: 450, type: 'square', dur: 0.08, vol: 0.06 })),
   // Cash register "cha-ching" whenever someone buys an item.
-  sold: play((ac) => {
-    cha(ac, 0);
-    cha(ac, 0.05);
-    ching(ac, 2093, 0.12);
-    ching(ac, 2637, 0.2, 0.13);
-  }),
+  sold: play((ac) => playRecording(ac, loadChaChing(ac))),
+  // Called when an auction starts so the first sale doesn't wait for decoding.
+  preload: play((ac) => loadChaChing(ac)),
   free: play((ac) => note(ac, { freq: 400, to: 1200, type: 'sine', dur: 0.18, vol: 0.18 })),
   undo: play((ac) => note(ac, { freq: 900, to: 300, type: 'sawtooth', dur: 0.22, vol: 0.06 })),
   // Rising arpeggio for the theme reveal.

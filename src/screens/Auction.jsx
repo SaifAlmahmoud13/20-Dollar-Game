@@ -14,6 +14,7 @@ export default function Auction({ game, onSell, onUndo, canUndo, onQuit, bidStep
   useEffect(() => setPrice(Math.min(small, ceiling)), [game.index, ceiling]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [confirmQuit, setConfirmQuit] = useState(false);
+  useEffect(() => sfx.preload(), []);
   const forced = forcedWinner(game);
   const bump = (d) => {
     (d > 0 ? sfx.bidUp : sfx.bidDown)();
