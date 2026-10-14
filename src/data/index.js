@@ -6,6 +6,8 @@ import heroes from './themes/heroes.js';
 import adventure from './themes/adventure.js';
 import IMAGES from './theme-images.js';
 import DUDS, { DEFAULT_DUDS } from './duds.js';
+import SCENES, { CATEGORY_SCENES } from './scenes.js';
+import SCENE_IMAGES from './scene-images.js';
 
 // Vite sets BASE_URL; plain Node (tests, scripts) has no import.meta.env.
 const BASE = import.meta.env?.BASE_URL ?? '/';
@@ -27,6 +29,12 @@ export function parseItems(str) {
   });
 }
 
+// The empty backdrop a theme's player boards use (see scenes.js), if its photo exists.
+function sceneFor(id, category) {
+  const scene = SCENES[id] ?? CATEGORY_SCENES[category];
+  return SCENE_IMAGES[scene] ? `${BASE}scenes/${scene}.webp` : null;
+}
+
 const build = (category, rows) =>
   rows.map(([name, emoji, items]) => ({
     id: slugify(name),
@@ -36,6 +44,7 @@ const build = (category, rows) =>
     items: parseItems(items),
     duds: DUDS[slugify(name)] ?? DEFAULT_DUDS,
     image: IMAGES[slugify(name)] ? `${BASE}themes/${slugify(name)}.webp` : null,
+    scene: sceneFor(slugify(name), category),
   }));
 
 const BUILT_IN = {
@@ -86,4 +95,12 @@ export function themeBackground(theme, shade = 'linear-gradient(rgba(0,0,0,0.1),
   return theme.image ? `${shade}, url("${theme.image}") center / cover` : themeGradient(theme.id);
 }
 
-export const PHOTO_CREDITS = Object.entries(IMAGES).map(([id, credit]) => ({ id, ...credit }));
+// A player board: the theme's empty scene, else its photo, else its colour gradient.
+export function boardBackground(theme) {
+  return theme.scene ? `linear-gradient(rgba(0,0,0,0.05), rgba(0,0,0,0.25)), url("${theme.scene}") center / cover` : themeBackground(theme);
+}
+
+export const PHOTO_CREDITS = [
+  ...Object.entries(IMAGES).map(([id, credit]) => ({ id, ...credit })),
+  ...Object.entries(SCENE_IMAGES).map(([id, credit]) => ({ id, scene: true, ...credit })),
+];

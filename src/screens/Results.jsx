@@ -4,6 +4,7 @@ import { AI_MODE, judgeGame, aiJudgeReady } from '../ai/index.js';
 import { localJudge } from '../game/judge.js';
 import { spent } from '../game/logic.js';
 import { money } from '../lib/format.js';
+import { useLayout } from '../lib/layout.js';
 
 const winnersOf = (scores) => {
   const best = Math.max(...scores);
@@ -74,6 +75,93 @@ export default function Results({
   }
 
   const decided = !!outcome;
+  const { landscape } = useLayout();
+
+  const title = (
+    <>
+      <h1 className="results-title">
+        {decided
+          ? `${outcome.winners.map((i) => game.players[i].name).join(' & ')} ${outcome.winners.length > 1 ? 'win' : 'wins'}!`
+          : 'Who built it better?'}
+      </h1>
+      {!decided && mode === 'vote' && <p className="muted center-text">Tap the winning build.</p>}
+    </>
+  );
+
+  const judge = mode === 'ai' && (
+    <div className="judge-card">
+      <div className="judge-head">
+        <span className="orb" aria-hidden="true" />
+        <span className="kicker">
+          {outcome?.verdict ? (outcome.source === 'offline' ? 'Offline judge' : 'AI-generated') : 'Judge'}
+        </span>
+      </div>
+      {outcome?.verdict ? (
+        <p className="verdict">{outcome.verdict}</p>
+      ) : busy ? (
+        <div className="skeleton" aria-label="The judge is thinking">
+          <span />
+          <span />
+          <span />
+        </div>
+      ) : (
+        <p className="muted">Ready when you are. The judge scores every build out of 10.</p>
+      )}
+      {note && <p className="muted judge-note">{note}</p>}
+    </div>
+  );
+
+  const boards = game.players.map((p, i) => (
+    <div className="board-wrap" key={i}>
+      <Board
+        theme={game.theme}
+        player={p}
+        highlight={outcome?.winners.includes(i)}
+        badge={outcome?.winners.includes(i) ? `${p.name} wins` : null}
+        onClick={!decided && mode === 'vote' ? () => setOutcome({ winners: [i] }) : undefined}
+      />
+      <div className="board-caption" style={{ color: p.color }}>
+        <span className="board-name">
+          {p.name}
+          {wins[p.name] ? <small> · {wins[p.name]} win{wins[p.name] === 1 ? '' : 's'}</small> : null}
+        </span>
+        <span className="board-score">
+          {outcome?.scores ? outcome.scores[i].toFixed(1) : `${money(spent(game, i))} spent`}
+        </span>
+      </div>
+    </div>
+  ));
+  const half = Math.ceil(boards.length / 2);
+
+  const actions = (
+    <>
+      {!decided && mode === 'ai' && (
+        <>
+          <button type="button" className="btn btn-primary" disabled={busy} onClick={askJudge}>
+            {busy ? 'Judging…' : 'Who won?'}
+          </button>
+          <button type="button" className="link" onClick={() => setMode('vote')}>
+            We'll decide ourselves
+          </button>
+        </>
+      )}
+      {decided && (
+        <>
+          <div className="row-buttons">
+            <button type="button" className="btn btn-ghost" onClick={onRematch}>
+              Rematch
+            </button>
+            <button type="button" className="btn btn-primary" onClick={onNewTheme}>
+              New theme
+            </button>
+          </div>
+          <button type="button" className="link" onClick={onChangeThemes}>
+            Change themes & settings
+          </button>
+        </>
+      )}
+    </>
+  );
 
   return (
     <div className="screen results">
@@ -86,83 +174,27 @@ export default function Results({
           {shareLabel}
         </button>
       </header>
-      <div className="content">
-        <h1 className="results-title">{decided ? `${outcome.winners.map((i) => game.players[i].name).join(' & ')} wins!` : 'Who built it better?'}</h1>
-        {!decided && mode === 'vote' && <p className="muted center-text">Tap the winning build.</p>}
-
-        {mode === 'ai' && (
-          <div className="judge-card">
-            <div className="judge-head">
-              <span className="orb" aria-hidden="true" />
-              <span className="kicker">
-                {outcome?.verdict ? (outcome.source === 'offline' ? 'Offline judge' : 'AI-generated') : 'Judge'}
-              </span>
-            </div>
-            {outcome?.verdict ? (
-              <p className="verdict">{outcome.verdict}</p>
-            ) : busy ? (
-              <div className="skeleton" aria-label="The judge is thinking">
-                <span /><span /><span />
-              </div>
-            ) : (
-              <p className="muted">Ready when you are. The judge scores every build out of 10.</p>
-            )}
-            {note && <p className="muted judge-note">{note}</p>}
+      {landscape ? (
+        // Boards either side, verdict in the middle.
+        <div className="stage">
+          <div className="stage-side">{boards.slice(0, half)}</div>
+          <div className="stage-center">
+            {title}
+            {judge}
+            <div className="stage-actions">{actions}</div>
           </div>
-        )}
-
-        <div className={`boards n${Math.min(game.players.length, 4)}`}>
-          {game.players.map((p, i) => (
-            <div className="board-wrap" key={i}>
-              <Board
-                theme={game.theme}
-                player={p}
-                highlight={outcome?.winners.includes(i)}
-                badge={outcome?.winners.includes(i) ? `${p.name} wins` : null}
-                onClick={!decided && mode === 'vote' ? () => setOutcome({ winners: [i] }) : undefined}
-              />
-              <div className="board-caption" style={{ color: p.color }}>
-                <span className="board-name">
-                  {p.name}
-                  {wins[p.name] ? <small> · {wins[p.name]} win{wins[p.name] === 1 ? '' : 's'}</small> : null}
-                </span>
-                <span className="board-score">
-                  {outcome?.scores ? outcome.scores[i].toFixed(1) : `${money(spent(game, i))} spent`}
-                </span>
-              </div>
-            </div>
-          ))}
+          <div className="stage-side">{boards.slice(half)}</div>
         </div>
-      </div>
-
-      <div className="footer">
-        {!decided && mode === 'ai' && (
-          <>
-            <button type="button" className="btn btn-primary" disabled={busy} onClick={askJudge}>
-              {busy ? 'Judging…' : 'Who won?'}
-            </button>
-
-            <button type="button" className="link" onClick={() => setMode('vote')}>
-              We'll decide ourselves
-            </button>
-          </>
-        )}
-        {decided && (
-          <>
-            <div className="row-buttons">
-              <button type="button" className="btn btn-ghost" onClick={onRematch}>
-                Rematch
-              </button>
-              <button type="button" className="btn btn-primary" onClick={onNewTheme}>
-                New theme
-              </button>
-            </div>
-            <button type="button" className="link" onClick={onChangeThemes}>
-              Change themes & settings
-            </button>
-          </>
-        )}
-      </div>
+      ) : (
+        <>
+          <div className="content">
+            {title}
+            {judge}
+            <div className={`boards n${Math.min(game.players.length, 4)}`}>{boards}</div>
+          </div>
+          <div className="footer">{actions}</div>
+        </>
+      )}
     </div>
   );
 }

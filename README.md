@@ -84,6 +84,18 @@ PEXELS_API_KEY=... npm run theme-images       # or Pexels; without a key it uses
 Search terms are in `scripts/image-queries.js`. Use `{ q: '...', pick: 2 }` to take a later result when the first
 one is a bad fit.
 
+### Board scenes
+
+While bidding and on the results screen, each player's items are placed as stickers on an empty scene for
+the theme (grass for Theme park, a basement for Boys' night, a ship's deck for One Piece…). The 31 scenes are in
+`public/scenes/`, chosen per theme in `src/data/scenes.js`, and fetched with
+`npm run theme-images -- --scenes` (search terms in `scripts/scene-queries.js`).
+
+### Landscape and portrait
+
+The game is landscape by default; **Portrait mode** under Advanced options switches it. On a phone held the other
+way, the game asks the screen to turn and, if it can't, rotates its own view (`src/lib/layout.js`).
+
 ### Adding a theme
 
 Add a row to the matching file in `src/data/themes/`:

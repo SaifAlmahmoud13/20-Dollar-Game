@@ -164,6 +164,14 @@ export default function Themes({
                 onChange={(bidStep) => setSettings({ ...settings, bidStep })}
               />
             </div>
+            <div className="setting-row">
+              <span>Portrait mode</span>
+              <Toggle
+                label="Portrait mode"
+                checked={settings.orientation === 'portrait'}
+                onChange={(on) => setSettings({ ...settings, orientation: on ? 'portrait' : 'landscape' })}
+              />
+            </div>
           </div>
         )}
         <button type="button" className="btn btn-primary" disabled={count === 0} onClick={onStart}>

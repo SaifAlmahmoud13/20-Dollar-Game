@@ -3,6 +3,7 @@ import { ALL_THEMES } from './data/index.js';
 import { createGame, isOver } from './game/logic.js';
 import { load, save, usePersistent } from './lib/storage.js';
 import { setSoundEnabled, sfx } from './lib/sound.js';
+import { LayoutContext, useOrientation } from './lib/layout.js';
 import Home from './screens/Home.jsx';
 import Players from './screens/Players.jsx';
 import Themes from './screens/Themes.jsx';
@@ -14,7 +15,7 @@ import { CreateThemeModal, HelpModal, SettingsModal } from './components/Modals.
 // A game in progress survives an accidental refresh.
 const restored = load('session', null);
 const IN_GAME = ['reveal', 'auction', 'results'];
-const DEFAULT_SETTINGS = { budget: 20, budgetStep: 1, itemsPerRound: 10, bidStep: 1, aiJudge: false, sound: true };
+const DEFAULT_SETTINGS = { budget: 20, budgetStep: 1, itemsPerRound: 10, bidStep: 1, aiJudge: false, sound: true, orientation: 'landscape' };
 
 export default function App() {
   const [screen, setScreen] = useState(restored?.screen ?? 'home');
@@ -36,6 +37,7 @@ export default function App() {
   const [modal, setModal] = useState(null);
 
   useEffect(() => setSoundEnabled(settings.sound !== false), [settings.sound]);
+  const layout = useOrientation(settings.orientation !== 'portrait');
 
   useEffect(() => {
     save('session', IN_GAME.includes(screen) ? { screen, theme, game, history, outcome, wins } : undefined);
@@ -175,18 +177,23 @@ export default function App() {
   }
 
   return (
-    <div className="app">
-      {view}
-      {modal === 'help' && <HelpModal onClose={() => setModal(null)} />}
-      {modal === 'settings' && <SettingsModal apiKey={apiKey} onSave={setApiKey} onClose={() => setModal(null)} />}
-      {modal === 'create' && (
-        <CreateThemeModal
-          apiKey={apiKey}
-          onNeedKey={() => setModal('settings')}
-          onCreate={addCustomTheme}
-          onClose={() => setModal(null)}
-        />
-      )}
-    </div>
+    <LayoutContext.Provider value={layout}>
+      <div
+        className={`app ${layout.landscape ? 'landscape' : 'portrait'} ${layout.rotated ? 'rotated' : ''}`}
+        style={layout.style}
+      >
+        <div className="app-scroll">{view}</div>
+        {modal === 'help' && <HelpModal onClose={() => setModal(null)} />}
+        {modal === 'settings' && <SettingsModal apiKey={apiKey} onSave={setApiKey} onClose={() => setModal(null)} />}
+        {modal === 'create' && (
+          <CreateThemeModal
+            apiKey={apiKey}
+            onNeedKey={() => setModal('settings')}
+            onCreate={addCustomTheme}
+            onClose={() => setModal(null)}
+          />
+        )}
+      </div>
+    </LayoutContext.Provider>
   );
 }

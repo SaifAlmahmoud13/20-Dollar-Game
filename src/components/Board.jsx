@@ -1,4 +1,4 @@
-import { themeBackground } from '../data/index.js';
+import { boardBackground } from '../data/index.js';
 
 function hash(str) {
   let h = 2166136261;
@@ -33,10 +33,10 @@ export default function Board({ theme, player, highlight, badge, onClick, compac
     <Tag
       type={onClick ? 'button' : undefined}
       className={`board ${highlight ? 'highlight' : ''} ${compact ? 'compact' : ''}`}
-      style={{ background: themeBackground(theme), '--player': player.color }}
+      style={{ background: boardBackground(theme), '--player': player.color }}
       onClick={onClick}
     >
-      {!theme.image && (
+      {!theme.image && !theme.scene && (
         <span className="board-watermark" aria-hidden="true">
           {theme.emoji}
         </span>

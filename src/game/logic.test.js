@@ -65,12 +65,20 @@ describe('auction', () => {
 });
 
 describe('theme photos', () => {
+  it('every theme has a board scene', async () => {
+    const { default: SCENES } = await import('../data/scenes.js');
+    const { default: SCENE_IMAGES } = await import('../data/scene-images.js');
+    for (const id of Object.values(SCENES)) expect(SCENE_IMAGES[id], id).toBeTruthy();
+    for (const t of ALL_THEMES) expect(t.scene, t.name).toBeTruthy();
+    for (const id of Object.keys(SCENES)) expect(THEMES_BY_ID[id], id).toBeTruthy();
+  });
+
   it('every credited photo exists and belongs to a real theme', async () => {
     const { existsSync } = await import('node:fs');
     const { PHOTO_CREDITS } = await import('../data/index.js');
     for (const c of PHOTO_CREDITS) {
-      expect(THEMES_BY_ID[c.id], c.id).toBeTruthy();
-      expect(existsSync(new URL(`../../public/themes/${c.id}.webp`, import.meta.url)), c.id).toBe(true);
+      if (!c.scene) expect(THEMES_BY_ID[c.id], c.id).toBeTruthy();
+      expect(existsSync(new URL(`../../public/${c.scene ? 'scenes' : 'themes'}/${c.id}.webp`, import.meta.url)), c.id).toBe(true);
       expect(c.author && c.license && c.page, c.id).toBeTruthy();
     }
   });

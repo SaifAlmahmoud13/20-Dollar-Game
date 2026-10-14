@@ -22,8 +22,8 @@ export function HelpModal({ onClose }) {
           <summary>Photo credits</summary>
           <ul>
             {PHOTO_CREDITS.map((c) => (
-              <li key={c.id}>
-                {THEMES_BY_ID[c.id]?.name ?? c.id}:{' '}
+              <li key={(c.scene ? 'scene-' : '') + c.id}>
+                {c.scene ? `Board scene (${c.id})` : THEMES_BY_ID[c.id]?.name ?? c.id}:{' '}
                 <a href={c.page} target="_blank" rel="noreferrer">
                   {c.author}
                 </a>{' '}
