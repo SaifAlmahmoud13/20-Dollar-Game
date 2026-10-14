@@ -75,19 +75,19 @@ async function searchWikimedia(q) {
     gsrlimit: '15',
     prop: 'imageinfo',
     iiprop: 'url|size|extmetadata',
-    iiurlwidth: '960', // Wikimedia only serves standard thumbnail widths
   });
   const data = await getJSON(`https://commons.wikimedia.org/w/api.php?${params}`);
   const pages = Object.values(data.query?.pages ?? {}).sort((a, b) => a.index - b.index);
   return pages
     .map((p) => p.imageinfo?.[0])
-    .filter((info) => info && info.width >= 480 && info.height >= 360)
+    // Originals come from upload.wikimedia.org; skip huge files to keep downloads quick.
+    .filter((info) => info && info.width >= 480 && info.height >= 360 && info.size < 12_000_000)
     .filter((info) => {
       const license = info.extmetadata?.LicenseShortName?.value ?? '';
       return license && !/fair use|non-free/i.test(license);
     })
     .map((info) => ({
-      url: info.thumburl ?? info.url,
+      url: info.url,
       credit: {
         source: 'Wikimedia Commons',
         author: stripHtml(info.extmetadata?.Artist?.value) || 'Unknown',
