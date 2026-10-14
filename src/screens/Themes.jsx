@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { CATEGORIES } from '../data/index.js';
 import ThemeCard from '../components/ThemeCard.jsx';
-import { TopBar, Toggle, Stepper } from '../components/ui.jsx';
+import { NumberInput, TopBar, Toggle, Stepper } from '../components/ui.jsx';
 import { AI_ENABLED, NEEDS_KEY } from '../ai/index.js';
-import { MAX_BUDGET, budgetStep, money } from '../lib/format.js';
+import { MAX_BUDGET, money } from '../lib/format.js';
 import { sfx } from '../lib/sound.js';
 
 export default function Themes({
@@ -121,9 +121,22 @@ export default function Themes({
                 value={settings.budget}
                 min={1}
                 max={MAX_BUDGET}
-                step={budgetStep}
+                step={settings.budgetStep ?? 1}
                 format={money}
                 onChange={(budget) => setSettings({ ...settings, budget })}
+              />
+            </div>
+            <div className="setting-row">
+              <span>Budget buttons move by</span>
+              <NumberInput
+                grow
+                className="step-input"
+                label="Budget buttons move by"
+                value={settings.budgetStep ?? 1}
+                min={1}
+                max={MAX_BUDGET}
+                format={money}
+                onChange={(budgetStep) => setSettings({ ...settings, budgetStep })}
               />
             </div>
             <div className="setting-row">
@@ -134,6 +147,19 @@ export default function Themes({
                 min={4}
                 max={16}
                 onChange={(itemsPerRound) => setSettings({ ...settings, itemsPerRound })}
+              />
+            </div>
+            <div className="setting-row">
+              <span>Bid buttons move by</span>
+              <NumberInput
+                grow
+                className="step-input"
+                label="Bid buttons move by"
+                value={settings.bidStep ?? 1}
+                min={1}
+                max={MAX_BUDGET}
+                format={money}
+                onChange={(bidStep) => setSettings({ ...settings, bidStep })}
               />
             </div>
           </div>

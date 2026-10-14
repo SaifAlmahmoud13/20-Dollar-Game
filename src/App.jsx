@@ -18,7 +18,7 @@ const IN_GAME = ['reveal', 'auction', 'results'];
 export default function App() {
   const [screen, setScreen] = useState(restored?.screen ?? 'home');
   const [setup, setSetup] = usePersistent('setup', { names: ['', ''], teams: false });
-  const [settings, setSettings] = usePersistent('settings', { budget: 20, itemsPerRound: 10, aiJudge: false, sound: true });
+  const [settings, setSettings] = usePersistent('settings', { budget: 20, budgetStep: 1, itemsPerRound: 10, bidStep: 1, aiJudge: false, sound: true });
   const [customThemes, setCustomThemes] = usePersistent('customThemes', []);
   const [selected, setSelected] = usePersistent('selected', ALL_THEMES.map((t) => t.id));
   const [apiKey, setApiKey] = usePersistent('apiKey', '');
@@ -134,7 +134,17 @@ export default function App() {
       );
       break;
     case 'auction':
-      view = <Auction game={game} onSell={handleSell} onUndo={undo} canUndo={history.length > 0} onQuit={() => setScreen('themes')} />;
+      view = (
+        <Auction
+          game={game}
+          onSell={handleSell}
+          onUndo={undo}
+          canUndo={history.length > 0}
+          onQuit={() => setScreen('themes')}
+          bidStep={settings.bidStep ?? 1}
+          onBidStep={(bidStep) => setSettings({ ...settings, bidStep })}
+        />
+      );
       break;
     case 'results':
       view = (

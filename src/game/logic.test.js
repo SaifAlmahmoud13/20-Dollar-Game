@@ -77,14 +77,11 @@ describe('theme photos', () => {
 });
 
 describe('money helpers', () => {
-  it('formats and scales steps with the budget', async () => {
-    const { money, shortMoney, bidSteps, budgetStep, niceStep } = await import('../lib/format.js');
+  it('formats money', async () => {
+    const { money, shortMoney, clamp } = await import('../lib/format.js');
     expect(money(1000000)).toBe('$1,000,000');
     expect(shortMoney(250000)).toBe('$250K');
-    expect(bidSteps(20)).toEqual({ small: 1, big: 5 });
-    expect(bidSteps(1_000_000)).toEqual({ small: 50_000, big: 250_000 });
-    expect(budgetStep(20)).toBe(5);
-    expect(niceStep(0.5)).toBe(1);
+    expect(clamp(5_000_000, 0, 1_000_000)).toBe(1_000_000);
   });
 
   it('runs a million-dollar game', () => {

@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Modal, NumberInput, TopBar } from '../components/ui.jsx';
 import { canBuy, currentItem, forcedWinner, maxBid, sell } from '../game/logic.js';
-import { bidSteps, money, shortMoney } from '../lib/format.js';
+import { MAX_BUDGET, money, shortMoney } from '../lib/format.js';
 import { sfx } from '../lib/sound.js';
 
-export default function Auction({ game, onSell, onUndo, canUndo, onQuit }) {
+export default function Auction({ game, onSell, onUndo, canUndo, onQuit, bidStep, onBidStep }) {
   const item = currentItem(game);
   const ceiling = maxBid(game);
-  const { small, big } = bidSteps(game.budget);
-  // Each item opens at the smallest bid step: $1 in a $20 game, $50K in a $1M game.
+  // The players choose how far the bid buttons move ($1 unless changed); each item opens at one step.
+  const small = bidStep;
+  const big = bidStep * 5;
   const [price, setPrice] = useState(Math.min(small, ceiling));
-  useEffect(() => setPrice(Math.min(small, ceiling)), [game.index, ceiling, small]);
+  useEffect(() => setPrice(Math.min(small, ceiling)), [game.index, ceiling]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [confirmQuit, setConfirmQuit] = useState(false);
   const forced = forcedWinner(game);
@@ -88,7 +89,22 @@ export default function Auction({ game, onSell, onUndo, canUndo, onQuit }) {
                 +{shortMoney(big).slice(1)}
               </button>
             </div>
-            <p className="bid-hint">Tap the price to type a bid</p>
+            <div className="bid-hint">
+              <span>Tap the price to type a bid ·</span>
+              <label className="step-label">
+                buttons move by
+                <NumberInput
+                  grow
+                  className="step-input"
+                  label="Bid buttons move by"
+                  value={bidStep}
+                  min={1}
+                  max={MAX_BUDGET}
+                  format={money}
+                  onChange={onBidStep}
+                />
+              </label>
+            </div>
           </div>
         )}
 

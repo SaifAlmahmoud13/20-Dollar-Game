@@ -23,7 +23,7 @@ export function NumberInput({ value, onChange, min = 0, max = Infinity, format =
   const shown = draft ?? format(value);
   return (
     <input
-      style={grow ? { width: `${Math.max(3, shown.length) + 1.5}ch` } : undefined}
+      style={grow ? { width: `calc(${Math.max(3, shown.length) + 1}ch + 20px)` } : undefined}
       className={`number-input ${className}`}
       type="text"
       inputMode="numeric"
