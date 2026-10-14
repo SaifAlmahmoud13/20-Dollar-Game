@@ -6,8 +6,8 @@
 //   node scripts/theme-images.mjs --only pizza,castle --force
 //
 // Node's fetch only uses HTTPS_PROXY with NODE_USE_ENV_PROXY=1 (set by the npm script).
-// Source: Pexels when PEXELS_API_KEY is set (free key at pexels.com/api),
-// otherwise Wikimedia Commons (no key, freely licensed).
+// Source: Pixabay when PIXABAY_API_KEY is set (free key at pixabay.com/api/docs),
+// Pexels when PEXELS_API_KEY is set, otherwise Wikimedia Commons (no key, but slow).
 
 import { writeFile, mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -24,10 +24,10 @@ const SIZE = 480;
 const USER_AGENT = '20-Dollar-Game/0.1 (https://github.com/SaifAlmahmoud13/20-Dollar-Game; theme image fetcher)';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// Wikimedia rate-limits shared addresses; go slowly and honour Retry-After.
+// Stay under API rate limits (Wikimedia is strict with shared addresses) and honour Retry-After.
 async function politeFetch(url, headers = {}) {
   for (let attempt = 0; ; attempt++) {
-    await sleep(1200);
+    await sleep(SOURCE === 'Wikimedia Commons' ? 1200 : 400);
     let res;
     try {
       res = await fetch(url, { headers: { 'User-Agent': USER_AGENT, ...headers } });
@@ -46,7 +46,9 @@ const args = process.argv.slice(2);
 const force = args.includes('--force');
 const onlyArg = args[args.indexOf('--only') + 1];
 const only = args.includes('--only') && onlyArg ? new Set(onlyArg.split(',')) : null;
+const pixabayKey = process.env.PIXABAY_API_KEY;
 const pexelsKey = process.env.PEXELS_API_KEY;
+const SOURCE = pixabayKey ? 'Pixabay' : pexelsKey ? 'Pexels' : 'Wikimedia Commons';
 
 const stripHtml = (s = '') => s.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
 
@@ -54,6 +56,21 @@ async function getJSON(url, headers = {}) {
   const res = await politeFetch(url, headers);
   if (!res.ok) throw new Error(`${res.status} ${res.statusText} for ${url}`);
   return res.json();
+}
+
+async function searchPixabay(q) {
+  const params = new URLSearchParams({
+    key: pixabayKey,
+    q: q.slice(0, 100),
+    image_type: 'photo',
+    safesearch: 'true',
+    per_page: '10',
+  });
+  const data = await getJSON(`https://pixabay.com/api/?${params}`);
+  return data.hits.map((h) => ({
+    url: h.largeImageURL,
+    credit: { source: 'Pixabay', author: h.user, license: 'Pixabay Content License', page: h.pageURL },
+  }));
 }
 
 async function searchPexels(q) {
@@ -100,7 +117,8 @@ async function searchWikimedia(q) {
 async function fetchTheme(theme) {
   const entry = QUERIES[theme.id] ?? theme.name;
   const { q, pick = 0 } = typeof entry === 'string' ? { q: entry } : entry;
-  const results = pexelsKey ? await searchPexels(q) : await searchWikimedia(q);
+  const search = { Pixabay: searchPixabay, Pexels: searchPexels, 'Wikimedia Commons': searchWikimedia }[SOURCE];
+  const results = await search(q);
   const chosen = results[pick] ?? results[0];
   if (!chosen) throw new Error(`no results for "${q}"`);
   const res = await politeFetch(chosen.url);
@@ -126,7 +144,7 @@ async function main() {
   await mkdir(OUT_DIR, { recursive: true });
   const manifest = { ...CURRENT };
   const todo = ALL_THEMES.filter((t) => (only ? only.has(t.id) : true) && (force || !manifest[t.id]));
-  console.log(`Fetching ${todo.length} theme photos from ${pexelsKey ? 'Pexels' : 'Wikimedia Commons'}…`);
+  console.log(`Fetching ${todo.length} theme photos from ${SOURCE}…`);
 
   const failures = [];
   const queue = [...todo];

@@ -65,7 +65,8 @@ lists. To (re)fetch them:
 ```bash
 npm run theme-images                          # every theme without a photo yet
 npm run theme-images -- --only pizza --force  # replace one
-PEXELS_API_KEY=... npm run theme-images       # use Pexels instead of Wikimedia Commons
+PIXABAY_API_KEY=... npm run theme-images      # use Pixabay (fast, recommended)
+PEXELS_API_KEY=... npm run theme-images       # or Pexels; without a key it uses Wikimedia Commons (slow)
 ```
 
 Search terms are in `scripts/image-queries.js`. Use `{ q: '...', pick: 2 }` to take a later result when the first
