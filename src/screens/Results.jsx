@@ -20,7 +20,7 @@ export default function Results({
   const [shareLabel, setShareLabel] = useState('Share');
 
   // The AI judge whenever there's internet; the offline judge when there isn't
-  // (or if Claude can't be reached), so there is always a verdict.
+  // (or if the AI can't be reached), so there is always a verdict.
   async function askJudge() {
     setBusy(true);
     setNote('');
@@ -30,7 +30,7 @@ export default function Results({
       try {
         result = await judgeGame(apiKey, game, label);
       } catch {
-        setNote('Claude couldn’t be reached, so the offline judge scored this one.');
+        setNote('The AI couldn’t be reached, so the offline judge scored this one.');
       }
     }
     if (!result) {

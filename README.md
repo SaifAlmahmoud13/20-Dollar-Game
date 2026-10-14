@@ -20,18 +20,19 @@ Mobile-first web app (React + Vite). Play on one phone passed around the room, o
 
 Budget per player ($5–$100) and items per round (4–16) are under **Advanced options**.
 
-## AI features (optional)
+## AI features
 
 **Create with AI** turns any idea ("Jujutsu Kaisen team", "Survive a week in the jungle") into a full theme, and
-the **AI judge** scores the final boards. Both use Claude (`claude-opus-5-5`).
+the **AI judge** scores the final boards with a roast.
 
-Open ⚙️ on the theme screen and paste an Anthropic API key from
-[console.anthropic.com](https://console.anthropic.com/settings/keys). The key is stored in the browser's
-localStorage and sent directly from the browser to the Anthropic API. That's fine on your own device, but don't
-deploy this publicly with a shared key baked in. Put a small backend in front if you want to offer AI to strangers.
+- **With internet** the app uses [Pollinations](https://pollinations.ai), a free AI service that needs no account
+  or key. Player names and the items they bought are sent to it to be judged.
+- **Without internet**, or if the AI can't be reached, the built-in offline judge (`src/game/judge.js`) scores the
+  boards instead. Each theme lists its must-have items first and its duds last (`src/data/duds.js`).
 
-Without a key the whole game still works: themes can be written by hand (**Create with AI → Write my own**)
-and players vote on the winner.
+Other builds (set `VITE_AI` at build time): `viewer` uses Claude through the claude.ai Artifact viewer (see below),
+`api` uses the Anthropic API with a key players paste in ⚙️ (stored only in their browser), and `off` uses only the
+offline judge.
 
 ## Development
 

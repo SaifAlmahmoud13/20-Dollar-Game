@@ -155,7 +155,7 @@ export function CreateThemeModal({ apiKey, onNeedKey, onCreate, onClose }) {
             ))}
           </div>
           <button type="button" className="btn btn-ai" disabled={!idea.trim() || busy} onClick={generate}>
-            {busy ? 'Claude is cooking…' : draft ? 'Try again' : 'Generate theme'}
+            {busy ? 'The AI is cooking…' : draft ? 'Try again' : 'Generate theme'}
           </button>
           {error && <p className="error">{error}</p>}
           {draft && (
