@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Modal } from './ui.jsx';
 import { generateTheme, AIError } from '../ai/index.js';
+import { PHOTO_CREDITS, THEMES_BY_ID } from '../data/index.js';
 
 export function HelpModal({ onClose }) {
   return (
@@ -13,6 +14,22 @@ export function HelpModal({ onClose }) {
         <li>When all items are gone, compare boards. Let the AI judge roast you all, or vote on who built it better.</li>
       </ol>
       <p className="muted">Tip: hype up the bad items so your friends overpay for them.</p>
+      {PHOTO_CREDITS.length > 0 && (
+        <details className="credits">
+          <summary>Photo credits</summary>
+          <ul>
+            {PHOTO_CREDITS.map((c) => (
+              <li key={c.id}>
+                {THEMES_BY_ID[c.id]?.name ?? c.id}:{' '}
+                <a href={c.page} target="_blank" rel="noreferrer">
+                  {c.author}
+                </a>{' '}
+                · {c.license} · {c.source}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
     </Modal>
   );
 }

@@ -4,6 +4,10 @@ import party from './themes/party.js';
 import sports from './themes/sports.js';
 import heroes from './themes/heroes.js';
 import adventure from './themes/adventure.js';
+import IMAGES from './theme-images.js';
+
+// Vite sets BASE_URL; plain Node (tests, scripts) has no import.meta.env.
+const BASE = import.meta.env?.BASE_URL ?? '/';
 
 export const slugify = (s) =>
   s
@@ -29,6 +33,7 @@ const build = (category, rows) =>
     emoji,
     category,
     items: parseItems(items),
+    image: IMAGES[slugify(name)] ? `${BASE}themes/${slugify(name)}.webp` : null,
   }));
 
 const BUILT_IN = {
@@ -72,3 +77,11 @@ export function themeGradient(id) {
   const h = themeHue(id);
   return `linear-gradient(150deg, hsl(${h} 62% 42%), hsl(${(h + 40) % 360} 55% 16%))`;
 }
+
+// Photo when the theme has one, otherwise its colour gradient. `shade` darkens the photo
+// so text or stickers on top stay readable.
+export function themeBackground(theme, shade = 'linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.3))') {
+  return theme.image ? `${shade}, url("${theme.image}") center / cover` : themeGradient(theme.id);
+}
+
+export const PHOTO_CREDITS = Object.entries(IMAGES).map(([id, credit]) => ({ id, ...credit }));

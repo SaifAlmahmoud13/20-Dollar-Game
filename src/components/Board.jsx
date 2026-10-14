@@ -1,4 +1,4 @@
-import { themeGradient } from '../data/index.js';
+import { themeBackground } from '../data/index.js';
 
 function hash(str) {
   let h = 2166136261;
@@ -33,12 +33,14 @@ export default function Board({ theme, player, highlight, badge, onClick, compac
     <Tag
       type={onClick ? 'button' : undefined}
       className={`board ${highlight ? 'highlight' : ''} ${compact ? 'compact' : ''}`}
-      style={{ background: themeGradient(theme.id), '--player': player.color }}
+      style={{ background: themeBackground(theme), '--player': player.color }}
       onClick={onClick}
     >
-      <span className="board-watermark" aria-hidden="true">
-        {theme.emoji}
-      </span>
+      {!theme.image && (
+        <span className="board-watermark" aria-hidden="true">
+          {theme.emoji}
+        </span>
+      )}
       {placed.map(({ item, left, top, rot }) => (
         <span key={item.name} className="sticker" style={{ left: `${left}%`, top: `${top}%`, '--rot': `${rot}deg` }}>
           <span className="sticker-emoji">{item.emoji}</span>

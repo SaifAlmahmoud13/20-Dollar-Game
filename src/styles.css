@@ -683,6 +683,10 @@ a {
   filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
 }
 
+.reveal-card.has-photo {
+  justify-content: flex-end;
+}
+
 .reveal-kicker {
   margin-top: 16px;
   text-transform: uppercase;
@@ -1190,6 +1194,22 @@ a {
   border-radius: 12px;
   padding: 8px 10px;
   font-size: 0.95rem;
+}
+
+.credits {
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.credits summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.credits ul {
+  padding-left: 18px;
+  line-height: 1.5;
 }
 
 @media (prefers-reduced-motion: reduce) {

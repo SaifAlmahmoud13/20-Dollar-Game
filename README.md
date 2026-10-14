@@ -56,6 +56,21 @@ src/
   components/        boards, theme cards, modals, small UI pieces
 ```
 
+### Theme photos
+
+Theme cards, the reveal and the result boards show a photo per theme (falling back to a colour gradient and emoji).
+Photos live in `public/themes/<id>.webp` and their credits in `src/data/theme-images.js`, which the Help screen
+lists. To (re)fetch them:
+
+```bash
+npm run theme-images                          # every theme without a photo yet
+npm run theme-images -- --only pizza --force  # replace one
+PEXELS_API_KEY=... npm run theme-images       # use Pexels instead of Wikimedia Commons
+```
+
+Search terms are in `scripts/image-queries.js`. Use `{ q: '...', pick: 2 }` to take a later result when the first
+one is a bad fit.
+
 ### Adding a theme
 
 Add a row to the matching file in `src/data/themes/`:

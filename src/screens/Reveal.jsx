@@ -1,4 +1,6 @@
-import { themeGradient } from '../data/index.js';
+import { themeBackground } from '../data/index.js';
+
+const TITLE_SHADE = 'linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.85))';
 import { TopBar } from '../components/ui.jsx';
 
 export default function Reveal({ theme, settings, canShuffle, onShuffle, onGo, onBack }) {
@@ -7,8 +9,8 @@ export default function Reveal({ theme, settings, canShuffle, onShuffle, onGo, o
     <div className="screen reveal">
       <TopBar onBack={onBack} title="Your theme" />
       <div className="content center">
-        <div className="reveal-card" key={theme.id} style={{ background: themeGradient(theme.id) }}>
-          <span className="reveal-emoji">{theme.emoji}</span>
+        <div className={`reveal-card ${theme.image ? 'has-photo' : ''}`} key={theme.id} style={{ background: themeBackground(theme, TITLE_SHADE) }}>
+          {!theme.image && <span className="reveal-emoji">{theme.emoji}</span>}
           <span className="reveal-kicker">Build the best</span>
           <h1>{theme.name}</h1>
         </div>
