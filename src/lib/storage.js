@@ -20,8 +20,12 @@ export function save(key, value) {
   }
 }
 
-export function usePersistent(key, fallback) {
-  const [value, setValue] = useState(() => load(key, fallback));
+// `prepare` adjusts a saved value when it's loaded (e.g. to fill in new settings).
+export function usePersistent(key, fallback, prepare) {
+  const [value, setValue] = useState(() => {
+    const saved = load(key, fallback);
+    return prepare ? prepare(saved) : saved;
+  });
   useEffect(() => save(key, value), [key, value]);
   return [value, setValue];
 }

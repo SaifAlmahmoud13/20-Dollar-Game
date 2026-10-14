@@ -14,11 +14,17 @@ import { CreateThemeModal, HelpModal, SettingsModal } from './components/Modals.
 // A game in progress survives an accidental refresh.
 const restored = load('session', null);
 const IN_GAME = ['reveal', 'auction', 'results'];
+const DEFAULT_SETTINGS = { budget: 20, budgetStep: 1, itemsPerRound: 10, bidStep: 1, aiJudge: false, sound: true };
 
 export default function App() {
   const [screen, setScreen] = useState(restored?.screen ?? 'home');
   const [setup, setSetup] = usePersistent('setup', { names: ['', ''], teams: false });
-  const [settings, setSettings] = usePersistent('settings', { budget: 20, budgetStep: 1, itemsPerRound: 10, bidStep: 1, aiJudge: false, sound: true });
+  const [settings, setSettings] = usePersistent('settings', DEFAULT_SETTINGS, (saved) => ({
+    ...DEFAULT_SETTINGS,
+    ...saved,
+    // Every visit starts at the default budget; a changed budget lasts until the game is closed.
+    budget: restored?.game?.budget ?? DEFAULT_SETTINGS.budget,
+  }));
   const [customThemes, setCustomThemes] = usePersistent('customThemes', []);
   const [selected, setSelected] = usePersistent('selected', ALL_THEMES.map((t) => t.id));
   const [apiKey, setApiKey] = usePersistent('apiKey', '');
