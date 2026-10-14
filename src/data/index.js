@@ -8,6 +8,7 @@ import IMAGES from './theme-images.js';
 import DUDS, { DEFAULT_DUDS } from './duds.js';
 import SCENES, { CATEGORY_SCENES } from './scenes.js';
 import SCENE_IMAGES from './scene-images.js';
+import ITEM_IMAGES from './item-images.js';
 
 // Vite sets BASE_URL; plain Node (tests, scripts) has no import.meta.env.
 const BASE = import.meta.env?.BASE_URL ?? '/';
@@ -98,6 +99,26 @@ export function themeBackground(theme, shade = 'linear-gradient(rgba(0,0,0,0.1),
 // A player board: the theme's empty scene, else its photo, else its colour gradient.
 export function boardBackground(theme) {
   return theme.scene ? `linear-gradient(rgba(0,0,0,0.05), rgba(0,0,0,0.25)), url("${theme.scene}") center / cover` : themeBackground(theme);
+}
+
+// Where an item's picture sits: its theme's sprite sheet (public/items/<theme>.webp). Custom
+// themes borrow from any sheet with an item of the same name. Null keeps the emoji.
+const SHEET_BY_NAME = {};
+for (const [id, sheet] of Object.entries(ITEM_IMAGES)) for (const name of Object.keys(sheet.items)) SHEET_BY_NAME[name.toLowerCase()] ??= id;
+
+export function itemPicture(theme, name) {
+  const key = String(name ?? '').trim().toLowerCase();
+  const id = THEMES_BY_ID[theme?.id] ? theme.id : SHEET_BY_NAME[key];
+  const sheet = ITEM_IMAGES[id];
+  const i = sheet && (sheet.items[name] ?? Object.entries(sheet.items).find(([n]) => n.toLowerCase() === key)?.[1]);
+  if (i === undefined || i === null) return null;
+  const col = i % sheet.cols;
+  const row = Math.floor(i / sheet.cols);
+  return {
+    backgroundImage: `url("${BASE}items/${id}.webp")`,
+    backgroundSize: `${sheet.cols * 100}% ${sheet.rows * 100}%`,
+    backgroundPosition: `${sheet.cols > 1 ? (col / (sheet.cols - 1)) * 100 : 0}% ${sheet.rows > 1 ? (row / (sheet.rows - 1)) * 100 : 0}%`,
+  };
 }
 
 export const PHOTO_CREDITS = [

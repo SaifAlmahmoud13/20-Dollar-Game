@@ -30,6 +30,13 @@ export function HelpModal({ onClose }) {
                 · {c.license} · {c.source}
               </li>
             ))}
+            <li>
+              Item pictures:{' '}
+              <a href="https://pixabay.com" target="_blank" rel="noreferrer">
+                Pixabay
+              </a>{' '}
+              contributors · Pixabay Content License
+            </li>
           </ul>
         </details>
       )}

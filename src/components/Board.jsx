@@ -1,4 +1,14 @@
-import { boardBackground } from '../data/index.js';
+import { boardBackground, itemPicture } from '../data/index.js';
+
+// An item's real picture when it has one, else its emoji.
+export function ItemArt({ theme, item, className }) {
+  const pic = itemPicture(theme, item.name);
+  return pic ? (
+    <span className={`${className} item-pic`} style={pic} role="img" aria-label={item.name} />
+  ) : (
+    <span className={className}>{item.emoji}</span>
+  );
+}
 
 function hash(str) {
   let h = 2166136261;
@@ -43,7 +53,7 @@ export default function Board({ theme, player, highlight, badge, onClick, compac
       )}
       {placed.map(({ item, left, top, rot }) => (
         <span key={item.name} className="sticker" style={{ left: `${left}%`, top: `${top}%`, '--rot': `${rot}deg` }}>
-          <span className="sticker-emoji">{item.emoji}</span>
+          <ItemArt theme={theme} item={item} className="sticker-emoji" />
           {!compact && <span className="sticker-label">{item.name}</span>}
         </span>
       ))}

@@ -82,6 +82,32 @@ describe('theme photos', () => {
       expect(c.author && c.license && c.page, c.id).toBeTruthy();
     }
   });
+
+  it('item pictures point at real sprite cells and real items', async () => {
+    const { existsSync } = await import('node:fs');
+    const { default: ITEM_IMAGES } = await import('../data/item-images.js');
+    const { itemPicture } = await import('../data/index.js');
+    for (const [id, sheet] of Object.entries(ITEM_IMAGES)) {
+      const t = THEMES_BY_ID[id];
+      expect(t, id).toBeTruthy();
+      expect(existsSync(new URL(`../../public/items/${id}.webp`, import.meta.url)), id).toBe(true);
+      for (const [name, i] of Object.entries(sheet.items)) {
+        expect(t.items.some((it) => it.name === name), `${id}: ${name}`).toBe(true);
+        expect(i, `${id}: ${name}`).toBeLessThan(sheet.cols * sheet.rows);
+        expect(itemPicture(t, name).backgroundImage, name).toContain(`items/${id}.webp`);
+      }
+    }
+  });
+
+  it('custom themes borrow pictures by item name; unknown items keep their emoji', async () => {
+    const { default: ITEM_IMAGES } = await import('../data/item-images.js');
+    const { itemPicture } = await import('../data/index.js');
+    const [id, sheet] = Object.entries(ITEM_IMAGES)[0];
+    const name = Object.keys(sheet.items)[0];
+    expect(itemPicture({ id: 'custom-x' }, ` ${name.toUpperCase()} `).backgroundImage).toContain(`items/${id}.webp`);
+    expect(itemPicture({ id: 'custom-x' }, 'Definitely not an item')).toBeNull();
+    expect(itemPicture(THEMES_BY_ID[id], 'Definitely not an item')).toBeNull();
+  });
 });
 
 describe('money helpers', () => {

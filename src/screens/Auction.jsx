@@ -4,7 +4,7 @@ import { canBuy, currentItem, forcedWinner, maxBid, sell } from '../game/logic.j
 import { MAX_BUDGET, money, shortMoney } from '../lib/format.js';
 import { sfx } from '../lib/sound.js';
 import { warmUpAI } from '../ai/index.js';
-import Board from '../components/Board.jsx';
+import Board, { ItemArt } from '../components/Board.jsx';
 import { useLayout } from '../lib/layout.js';
 
 export default function Auction({ game, onSell, onUndo, canUndo, onQuit, bidStep, onBidStep, aiJudge }) {
@@ -44,7 +44,7 @@ export default function Auction({ game, onSell, onUndo, canUndo, onQuit, bidStep
       </div>
 
       <div className="lot" key={game.index}>
-        <span className="lot-emoji">{item.emoji}</span>
+        <ItemArt theme={game.theme} item={item} className="lot-emoji" />
         <span className="lot-name">{item.name}</span>
       </div>
 

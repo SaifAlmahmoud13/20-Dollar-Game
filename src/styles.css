@@ -782,6 +782,11 @@ a {
   filter: drop-shadow(0 6px 14px rgba(243, 146, 0, 0.35));
 }
 
+.lot-emoji.item-pic {
+  width: 8rem;
+  height: 8rem;
+}
+
 .lot-name {
   font-size: 1.8rem;
   font-weight: 800;
@@ -1039,6 +1044,17 @@ a {
   font-size: 13cqw;
   line-height: 1;
   filter: drop-shadow(0 0 1.2cqw #fff) drop-shadow(0 1cqw 1.5cqw rgba(0, 0, 0, 0.5));
+}
+
+.sticker-emoji.item-pic {
+  width: 20cqw;
+  height: 20cqw;
+  filter: drop-shadow(0 0 0.6cqw #fff) drop-shadow(0 1cqw 1.5cqw rgba(0, 0, 0, 0.5));
+}
+
+.item-pic {
+  display: block;
+  background-repeat: no-repeat;
 }
 
 .sticker-label {
@@ -1395,6 +1411,11 @@ a {
 
 .app.landscape .lot-emoji {
   font-size: clamp(2.4rem, 13cqh, 4rem);
+}
+
+.app.landscape .lot-emoji.item-pic {
+  width: clamp(3.2rem, 18cqh, 5.5rem);
+  height: clamp(3.2rem, 18cqh, 5.5rem);
 }
 
 .app.landscape .lot-name {
