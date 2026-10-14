@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Board from '../components/Board.jsx';
 import { judgeGame, AIError, AI_ENABLED, NEEDS_KEY } from '../ai/index.js';
 import { spent } from '../game/logic.js';
+import { money } from '../lib/format.js';
 
 const winnersOf = (scores) => {
   const best = Math.max(...scores);
@@ -104,7 +105,7 @@ export default function Results({
                   {wins[p.name] ? <small> · {wins[p.name]} win{wins[p.name] === 1 ? '' : 's'}</small> : null}
                 </span>
                 <span className="board-score">
-                  {outcome?.scores ? outcome.scores[i].toFixed(1) : `$${spent(game, i)} spent`}
+                  {outcome?.scores ? outcome.scores[i].toFixed(1) : `${money(spent(game, i))} spent`}
                 </span>
               </div>
             </div>

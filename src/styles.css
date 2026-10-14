@@ -457,6 +457,7 @@ a {
 
 .setting-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   padding: 14px 18px;
@@ -494,6 +495,7 @@ a {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-left: auto;
 }
 
 .stepper button {
@@ -510,9 +512,10 @@ a {
 }
 
 .stepper-value {
-  min-width: 52px;
-  text-align: center;
-  font-size: 1.3rem;
+  max-width: 100%;
+  font-size: 1.2rem;
+  padding: 6px 4px;
+  background: var(--bg);
 }
 
 /* Theme selection */
@@ -757,25 +760,53 @@ a {
 
 .bid-controls {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 20px;
 }
 
-.price {
-  font-size: 3rem;
-  font-weight: 900;
-  min-width: 110px;
-  text-align: center;
-  color: var(--accent);
+.bid-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.bid-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.number-input {
+  font: inherit;
   font-variant-numeric: tabular-nums;
+  text-align: center;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  outline: none;
+  min-width: 0;
+}
+
+.number-input:focus {
+  border-color: var(--accent);
+  background: var(--surface);
+}
+
+.price {
+  width: 100%;
+  font-size: clamp(2rem, 11vw, 3rem);
+  font-weight: 900;
+  color: var(--accent);
+  padding: 2px 8px;
 }
 
 .round-btn {
-  width: 56px;
+  min-width: 64px;
   height: 56px;
-  border-radius: 50%;
+  padding: 0 12px;
+  border-radius: 999px;
   background: var(--surface);
   font-weight: 800;
   font-size: 1.05rem;
@@ -861,6 +892,8 @@ a {
 
 .sold-btn {
   flex-shrink: 0;
+  max-width: 45%;
+  overflow-wrap: anywhere;
   background: var(--player);
   color: #000;
   font-weight: 800;

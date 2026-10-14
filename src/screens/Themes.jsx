@@ -3,6 +3,8 @@ import { CATEGORIES } from '../data/index.js';
 import ThemeCard from '../components/ThemeCard.jsx';
 import { TopBar, Toggle, Stepper } from '../components/ui.jsx';
 import { AI_ENABLED, NEEDS_KEY } from '../ai/index.js';
+import { MAX_BUDGET, budgetStep, money } from '../lib/format.js';
+import { sfx } from '../lib/sound.js';
 
 export default function Themes({
   allThemes, customThemes, selected, setSelected, settings, setSettings, apiKey,
@@ -31,6 +33,14 @@ export default function Themes({
         title="$20 Challenge"
         right={
           <>
+            <button
+              type="button"
+              className="icon-btn"
+              aria-label={settings.sound === false ? 'Turn sound on' : 'Turn sound off'}
+              onClick={() => setSettings({ ...settings, sound: settings.sound === false })}
+            >
+              {settings.sound === false ? '🔇' : '🔊'}
+            </button>
             {NEEDS_KEY && (
               <button type="button" className="icon-btn" aria-label="AI settings" onClick={onSettings}>
                 ⚙️
@@ -81,7 +91,10 @@ export default function Themes({
               key={t.id}
               theme={t}
               selected={chosen.has(t.id)}
-              onToggle={() => toggle(t.id)}
+              onToggle={() => {
+                sfx.tap();
+                toggle(t.id);
+              }}
               onDelete={category.id === 'custom' ? () => onDeleteCustom(t.id) : undefined}
             />
           ))}
@@ -104,19 +117,19 @@ export default function Themes({
             <div className="setting-row">
               <span>Budget per player</span>
               <Stepper
-                label="budget"
+                label="Budget per player"
                 value={settings.budget}
-                min={5}
-                max={100}
-                step={5}
-                format={(v) => `$${v}`}
+                min={1}
+                max={MAX_BUDGET}
+                step={budgetStep}
+                format={money}
                 onChange={(budget) => setSettings({ ...settings, budget })}
               />
             </div>
             <div className="setting-row">
               <span>Items per round</span>
               <Stepper
-                label="items per round"
+                label="Items per round"
                 value={settings.itemsPerRound}
                 min={4}
                 max={16}

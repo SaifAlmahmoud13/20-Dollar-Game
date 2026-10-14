@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ALL_THEMES } from './data/index.js';
 import { createGame, isOver } from './game/logic.js';
 import { load, save, usePersistent } from './lib/storage.js';
+import { setSoundEnabled, sfx } from './lib/sound.js';
 import Home from './screens/Home.jsx';
 import Players from './screens/Players.jsx';
 import Themes from './screens/Themes.jsx';
@@ -17,7 +18,7 @@ const IN_GAME = ['reveal', 'auction', 'results'];
 export default function App() {
   const [screen, setScreen] = useState(restored?.screen ?? 'home');
   const [setup, setSetup] = usePersistent('setup', { names: ['', ''], teams: false });
-  const [settings, setSettings] = usePersistent('settings', { budget: 20, itemsPerRound: 10, aiJudge: false });
+  const [settings, setSettings] = usePersistent('settings', { budget: 20, itemsPerRound: 10, aiJudge: false, sound: true });
   const [customThemes, setCustomThemes] = usePersistent('customThemes', []);
   const [selected, setSelected] = usePersistent('selected', ALL_THEMES.map((t) => t.id));
   const [apiKey, setApiKey] = usePersistent('apiKey', '');
@@ -27,6 +28,8 @@ export default function App() {
   const [outcome, setOutcome] = useState(restored?.outcome ?? null);
   const [wins, setWins] = useState(restored?.wins ?? {});
   const [modal, setModal] = useState(null);
+
+  useEffect(() => setSoundEnabled(settings.sound !== false), [settings.sound]);
 
   useEffect(() => {
     save('session', IN_GAME.includes(screen) ? { screen, theme, game, history, outcome, wins } : undefined);
@@ -70,6 +73,7 @@ export default function App() {
   }
 
   function decide(result) {
+    sfx.win();
     setOutcome(result);
     setWins((w) => {
       const next = { ...w };

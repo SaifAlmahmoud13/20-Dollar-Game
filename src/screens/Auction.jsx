@@ -1,16 +1,27 @@
 import { useEffect, useState } from 'react';
-import { Modal, TopBar } from '../components/ui.jsx';
+import { Modal, NumberInput, TopBar } from '../components/ui.jsx';
 import { canBuy, currentItem, forcedWinner, maxBid, sell } from '../game/logic.js';
+import { bidSteps, money, shortMoney } from '../lib/format.js';
+import { sfx } from '../lib/sound.js';
 
 export default function Auction({ game, onSell, onUndo, canUndo, onQuit }) {
   const item = currentItem(game);
   const ceiling = maxBid(game);
-  const [price, setPrice] = useState(Math.min(1, ceiling));
-  useEffect(() => setPrice(Math.min(1, ceiling)), [game.index, ceiling]);
+  const { small, big } = bidSteps(game.budget);
+  // Each item opens at the smallest bid step: $1 in a $20 game, $50K in a $1M game.
+  const [price, setPrice] = useState(Math.min(small, ceiling));
+  useEffect(() => setPrice(Math.min(small, ceiling)), [game.index, ceiling, small]);
 
   const [confirmQuit, setConfirmQuit] = useState(false);
   const forced = forcedWinner(game);
-  const bump = (d) => setPrice((p) => Math.max(0, Math.min(ceiling, p + d)));
+  const bump = (d) => {
+    (d > 0 ? sfx.bidUp : sfx.bidDown)();
+    setPrice((p) => Math.max(0, Math.min(ceiling, p + d)));
+  };
+  const sellTo = (p, at) => {
+    (at === 0 && forced !== null ? sfx.free : sfx.sold)();
+    onSell(sell(game, p, at));
+  };
 
   return (
     <div className="screen auction">
@@ -18,7 +29,16 @@ export default function Auction({ game, onSell, onUndo, canUndo, onQuit }) {
         onBack={() => (game.index > 0 ? setConfirmQuit(true) : onQuit())}
         title={game.theme.name}
         right={
-          <button type="button" className="icon-btn" aria-label="Undo last sale" disabled={!canUndo} onClick={onUndo}>
+          <button
+            type="button"
+            className="icon-btn"
+            aria-label="Undo last sale"
+            disabled={!canUndo}
+            onClick={() => {
+              sfx.undo();
+              onUndo();
+            }}
+          >
             ↶
           </button>
         }
@@ -42,24 +62,33 @@ export default function Auction({ game, onSell, onUndo, canUndo, onQuit }) {
               Only <b style={{ color: game.players[forced].color }}>{game.players[forced].name}</b> has room left, so
               it's theirs for free.
             </p>
-            <button type="button" className="btn btn-primary" onClick={() => onSell(sell(game, forced, 0))}>
+            <button type="button" className="btn btn-primary" onClick={() => sellTo(forced, 0)}>
               Give it to {game.players[forced].name}
             </button>
           </div>
         ) : (
           <div className="bid-controls">
-            <button type="button" className="round-btn" aria-label="Lower price" disabled={price <= 0} onClick={() => bump(-1)}>
-              −1
-            </button>
-            <span className="price" aria-live="polite">
-              ${price}
-            </span>
-            <button type="button" className="round-btn" aria-label="Raise price by 1" disabled={price >= ceiling} onClick={() => bump(1)}>
-              +1
-            </button>
-            <button type="button" className="round-btn" aria-label="Raise price by 5" disabled={price >= ceiling} onClick={() => bump(5)}>
-              +5
-            </button>
+            <NumberInput
+              className="price"
+              label="Price"
+              value={price}
+              onChange={setPrice}
+              min={0}
+              max={ceiling}
+              format={money}
+            />
+            <div className="bid-buttons">
+              <button type="button" className="round-btn" aria-label={`Lower price by ${money(small)}`} disabled={price <= 0} onClick={() => bump(-small)}>
+                −{shortMoney(small).slice(1)}
+              </button>
+              <button type="button" className="round-btn" aria-label={`Raise price by ${money(small)}`} disabled={price >= ceiling} onClick={() => bump(small)}>
+                +{shortMoney(small).slice(1)}
+              </button>
+              <button type="button" className="round-btn" aria-label={`Raise price by ${money(big)}`} disabled={price >= ceiling} onClick={() => bump(big)}>
+                +{shortMoney(big).slice(1)}
+              </button>
+            </div>
+            <p className="bid-hint">Tap the price to type a bid</p>
           </div>
         )}
 
@@ -72,18 +101,18 @@ export default function Auction({ game, onSell, onUndo, canUndo, onQuit }) {
                 <div className="bidder-info">
                   <span className="bidder-name">{p.name}</span>
                   <span className="bidder-stats">
-                    <b>${p.money}</b> left · {full ? 'full' : `${game.slots - p.items.length} slot${game.slots - p.items.length === 1 ? '' : 's'} left`}
+                    <b>{money(p.money)}</b> left · {full ? 'full' : `${game.slots - p.items.length} slot${game.slots - p.items.length === 1 ? '' : 's'} left`}
                   </span>
                   <span className="bidder-items">
                     {p.items.map((it) => (
-                      <span key={it.name} title={`${it.name} ($${it.price})`}>
+                      <span key={it.name} title={`${it.name} (${money(it.price)})`}>
                         {it.emoji}
                       </span>
                     ))}
                   </span>
                 </div>
-                <button type="button" className="sold-btn" disabled={!ok} onClick={() => onSell(sell(game, i, price))}>
-                  Sold ${price}
+                <button type="button" className="sold-btn" disabled={!ok} onClick={() => sellTo(i, price)}>
+                  Sold {money(price)}
                 </button>
               </li>
             );

@@ -75,3 +75,23 @@ describe('theme photos', () => {
     }
   });
 });
+
+describe('money helpers', () => {
+  it('formats and scales steps with the budget', async () => {
+    const { money, shortMoney, bidSteps, budgetStep, niceStep } = await import('../lib/format.js');
+    expect(money(1000000)).toBe('$1,000,000');
+    expect(shortMoney(250000)).toBe('$250K');
+    expect(bidSteps(20)).toEqual({ small: 1, big: 5 });
+    expect(bidSteps(1_000_000)).toEqual({ small: 50_000, big: 250_000 });
+    expect(budgetStep(20)).toBe(5);
+    expect(niceStep(0.5)).toBe(1);
+  });
+
+  it('runs a million-dollar game', () => {
+    let g = createGame({ names: ['A', 'B'], theme, budget: 1_000_000, itemsPerRound: 4, rng: seeded() });
+    g = sell(g, 0, 750_000);
+    expect(g.players[0].money).toBe(250_000);
+    expect(canBuy(g, 0, 250_001)).toBe(false);
+    expect(maxBid(g)).toBe(1_000_000);
+  });
+});

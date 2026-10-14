@@ -1,10 +1,14 @@
+import { useEffect } from 'react';
 import { themeBackground } from '../data/index.js';
+import { TopBar } from '../components/ui.jsx';
+import { money } from '../lib/format.js';
+import { sfx } from '../lib/sound.js';
 
 const TITLE_SHADE = 'linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.85))';
-import { TopBar } from '../components/ui.jsx';
 
 export default function Reveal({ theme, settings, canShuffle, onShuffle, onGo, onBack }) {
   const items = Math.min(settings.itemsPerRound, theme.items.length);
+  useEffect(() => sfx.reveal(), [theme.id]);
   return (
     <div className="screen reveal">
       <TopBar onBack={onBack} title="Your theme" />
@@ -15,7 +19,7 @@ export default function Reveal({ theme, settings, canShuffle, onShuffle, onGo, o
           <h1>{theme.name}</h1>
         </div>
         <p className="reveal-meta">
-          ${settings.budget} each · {items} items up for auction
+          {money(settings.budget)} each · {items} items up for auction
         </p>
       </div>
       <div className="footer">
