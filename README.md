@@ -42,7 +42,13 @@ npm test         # game rules + theme data checks
 npm run build    # static site in dist/
 ```
 
-`dist/` is a static site and can be hosted anywhere (Netlify, Vercel, GitHub Pages, …).
+`dist/` is a static site and can be hosted anywhere. `npm run build` also writes `dist/sw.js`, a service worker
+that stores the whole game (code, photos, sounds) on first visit, so it then opens and plays offline and can be
+added to a phone's home screen.
+
+Every push to the main branch is published to GitHub Pages by `.github/workflows/pages.yml`
+(https://saifalmahmoud13.github.io/20-Dollar-Game/). Pages must be switched on once under
+Settings → Pages → Source: GitHub Actions.
 
 `npm run build:artifact` builds a version for a claude.ai Artifact in `dist-artifact/`: one page with the JS and
 CSS inlined, plus `themes/*.webp` published alongside it. Artifacts can't reach the Anthropic API directly, so this
