@@ -90,11 +90,11 @@ describe('theme photos', () => {
     for (const [id, sheet] of Object.entries(ITEM_IMAGES)) {
       const t = THEMES_BY_ID[id];
       expect(t, id).toBeTruthy();
-      expect(existsSync(new URL(`../../public/items/${id}.webp`, import.meta.url)), id).toBe(true);
+      expect(existsSync(new URL(`../../public/items/${sheet.file}`, import.meta.url)), id).toBe(true);
       for (const [name, i] of Object.entries(sheet.items)) {
         expect(t.items.some((it) => it.name === name), `${id}: ${name}`).toBe(true);
         expect(i, `${id}: ${name}`).toBeLessThan(sheet.cols * sheet.rows);
-        expect(itemPicture(t, name).backgroundImage, name).toContain(`items/${id}.webp`);
+        expect(itemPicture(t, name).backgroundImage, name).toContain(`items/${sheet.file}`);
       }
     }
   });
@@ -104,7 +104,7 @@ describe('theme photos', () => {
     const { itemPicture } = await import('../data/index.js');
     const [id, sheet] = Object.entries(ITEM_IMAGES)[0];
     const name = Object.keys(sheet.items)[0];
-    expect(itemPicture({ id: 'custom-x' }, ` ${name.toUpperCase()} `).backgroundImage).toContain(`items/${id}.webp`);
+    expect(itemPicture({ id: 'custom-x' }, ` ${name.toUpperCase()} `).backgroundImage).toContain(`items/${sheet.file}`);
     expect(itemPicture({ id: 'custom-x' }, 'Definitely not an item')).toBeNull();
     expect(itemPicture(THEMES_BY_ID[id], 'Definitely not an item')).toBeNull();
   });

@@ -101,7 +101,7 @@ export function boardBackground(theme) {
   return theme.scene ? `linear-gradient(rgba(0,0,0,0.05), rgba(0,0,0,0.25)), url("${theme.scene}") center / cover` : themeBackground(theme);
 }
 
-// Where an item's picture sits: its theme's sprite sheet (public/items/<theme>.webp). Custom
+// Where an item's picture sits: its theme's sprite sheet (public/items/<theme>-<hash>.webp). Custom
 // themes borrow from any sheet with an item of the same name. Null keeps the emoji.
 const SHEET_BY_NAME = {};
 for (const [id, sheet] of Object.entries(ITEM_IMAGES)) for (const name of Object.keys(sheet.items)) SHEET_BY_NAME[name.toLowerCase()] ??= id;
@@ -115,7 +115,7 @@ export function itemPicture(theme, name) {
   const col = i % sheet.cols;
   const row = Math.floor(i / sheet.cols);
   return {
-    backgroundImage: `url("${BASE}items/${id}.webp")`,
+    backgroundImage: `url("${BASE}items/${sheet.file}")`,
     backgroundSize: `${sheet.cols * 100}% ${sheet.rows * 100}%`,
     backgroundPosition: `${sheet.cols > 1 ? (col / (sheet.cols - 1)) * 100 : 0}% ${sheet.rows > 1 ? (row / (sheet.rows - 1)) * 100 : 0}%`,
   };
