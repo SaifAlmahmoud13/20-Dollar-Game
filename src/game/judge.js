@@ -1,7 +1,6 @@
 // The offline judge: scores every board and writes a short roast with no internet.
 // Each theme lists its items best first and its duds last (see data/duds.js), so an
 // item's place in that list says how good a pick it was.
-import { money } from '../lib/format.js';
 
 const STAR_COUNT = 6;
 
@@ -41,61 +40,49 @@ export function localJudge(game) {
   const loser = players[loserIdx];
   const seed = theme.id + players.map((p) => p.name + p.items.map((it) => it.name).join()).join('|');
 
+  // The verdict only talks about which picks are better; prices and money don't matter.
+  const ranked = (p) => [...p.items].sort((x, y) => itemQuality(theme, y.name) - itemQuality(theme, x.name));
   const sentences = [];
   if (winners.length > 1) {
-    sentences.push(`It's a tie between ${winners.map((w) => w.name).join(' and ')}. The judge can't split them.`);
+    sentences.push(
+      `It's a tie between ${winners.map((w) => w.name).join(' and ')}: ${winners.map((w) => ranked(w)[0]?.name).filter(Boolean).join(' and ')} cancel each other out.`,
+    );
   } else {
     const w = winners[0];
-    const star = [...w.items].sort((a, b) => itemQuality(theme, b.name) - itemQuality(theme, a.name))[0];
-    const bargain = w.items.find((it) => it.price <= game.budget * 0.1 && itemQuality(theme, it.name) >= 8.8);
+    const [top1, top2] = ranked(w);
     sentences.push(
-      bargain
+      top2
         ? pick(
             [
-              `${w.name} wins, and getting ${bargain.name} for ${money(bargain.price)} was daylight robbery.`,
-              `${w.name} takes it. ${bargain.name} for just ${money(bargain.price)} was the steal of the night.`,
+              `${w.name} wins with the stronger ${theme.name}: ${top1.name} and ${top2.name} lead the way.`,
+              `${w.name} takes it. ${top1.name} and ${top2.name} are the best picks on the table.`,
+              `${w.name} built the best ${theme.name}, and ${top1.name} is the standout.`,
             ],
             seed,
           )
-        : pick(
-            [
-              `${w.name} built the best ${theme.name.toLowerCase()} here, with ${star.name} leading the way.`,
-              `${w.name} wins it. ${star.name} was the pick that sealed it.`,
-              `${w.name} takes the crown. Hard to argue with ${star.name}.`,
-            ],
-            seed,
-          ),
+        : `${w.name} wins, and ${top1.name} is the standout pick.`,
     );
   }
 
   if (worst < best && loser) {
-    const dud = loser.items.find((it) => isDud(theme, it.name));
-    if (dud) {
+    const winnerBest = winners.length === 1 ? ranked(winners[0])[0] : null;
+    const weakest = ranked(loser).at(-1);
+    if (weakest && isDud(theme, weakest.name)) {
       sentences.push(
-        dud.price > 0
-          ? pick(
-              [
-                `${loser.name} paid ${money(dud.price)} for ${dud.name}. Bold choice.`,
-                `${loser.name} spent ${money(dud.price)} on ${dud.name}, and the judge has questions.`,
-                `Nobody asked for ${dud.name}, ${loser.name}, least of all at ${money(dud.price)}.`,
-              ],
-              seed + 'l',
-            )
-          : pick(
-              [`${loser.name} got stuck with ${dud.name} and it shows.`, `${dud.name} really let ${loser.name} down.`],
-              seed + 'l',
-            ),
+        pick(
+          [
+            `${loser.name} got stuck with ${weakest.name}, the weakest pick of the night.`,
+            `${weakest.name} really let ${loser.name} down.`,
+            `Nobody wanted ${weakest.name}, ${loser.name}.`,
+          ],
+          seed + 'l',
+        ),
       );
+    } else if (winnerBest && weakest) {
+      sentences.push(`${loser.name}'s ${weakest.name} is no match for ${winnerBest.name}.`);
     } else {
-      sentences.push(pick([`${loser.name} played it safe and it shows.`, `${loser.name} was close, but not close enough.`], seed + 'l'));
+      sentences.push(`${loser.name} was close, but not close enough.`);
     }
-  }
-
-  // The priciest purchase of the night, if it was a real splurge and isn't already mentioned.
-  let priciest = null;
-  for (const p of players) for (const it of p.items) if (!priciest || it.price > priciest.it.price) priciest = { p, it };
-  if (priciest && priciest.it.price >= game.budget * 0.25 && !sentences.some((s) => s.includes(priciest.it.name))) {
-    sentences.push(`Biggest splash: ${priciest.p.name} dropping ${money(priciest.it.price)} on ${priciest.it.name}.`);
   }
 
   return { scores, verdict: sentences.join(' ') };

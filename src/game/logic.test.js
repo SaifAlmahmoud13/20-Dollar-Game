@@ -114,6 +114,7 @@ describe('offline judge', () => {
     expect(verdict).toContain('Ana');
     expect(verdict).toMatch(/Ben/);
     expect(localJudge(game).verdict).toBe(verdict); // same game, same verdict
+    expect(verdict).not.toMatch(/\$|paid|spent|steal|robbery|splash/i); // money never matters
   });
 
   it('every theme has fewer duds than items', () => {

@@ -1,7 +1,6 @@
 // Prompts and answer clean-up shared by both ways of reaching Claude
 // (the Anthropic API with a player's key, and the claude.ai Artifact viewer).
 import { AIError } from './errors.js';
-import { money } from '../lib/format.js';
 
 export const THEME_INSTRUCTIONS =
   'You design themes for the "$20 Challenge", a party auction game. Players get a small budget, ' +
@@ -14,14 +13,15 @@ export const themeRequest = (idea) => `Create a theme for: ${idea}\n\nReturn exa
 
 export const JUDGE_INSTRUCTIONS =
   'You are the AI judge of the "$20 Challenge" party game. Players bid a small budget on items to build the best ' +
-  'version of a theme. Judge how well each build fits the theme and works as a whole; money left over does not count. ' +
+  'version of a theme. Judge only how good each player\'s picks are and how well they fit the theme; prices, spending ' +
+  'and money do not matter at all, so never mention them. ' +
   'Use the full 0-10 range so the winner is clear. Your verdict is a playful roast like a game-show host: name the winner, ' +
   'tease the weakest picks, keep it friendly and PG-13. Refer to players by their names.';
 
 export function judgeRequest(game, label = 'Player') {
   const lines = game.players.map((p, i) => {
-    const items = p.items.map((it) => `${it.name} (${money(it.price)})`).join(', ') || 'nothing';
-    return `${label} ${i + 1} — "${p.name}": ${items}. Money left: ${money(p.money)}.`;
+    const items = p.items.map((it) => it.name).join(', ') || 'nothing';
+    return `${label} ${i + 1} — "${p.name}": ${items}.`;
   });
   return `Theme: ${game.theme.name}\n\n${lines.join('\n')}`;
 }
