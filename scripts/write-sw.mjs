@@ -40,23 +40,36 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Serve the game from the phone first; fall back to the network for anything not stored
-// (and keep a copy). Opening the app offline always gets the stored page.
+// Pages: the newest version from the internet when online (so updates show up straight
+// away), the stored copy when offline. Everything else (code, photos, sounds, which have
+// unique names per version): the stored copy first, else the internet (and keep a copy).
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
-  event.respondWith(
-    caches.match(request, { ignoreSearch: true }).then((hit) => {
-      if (hit) return hit;
-      return fetch(request)
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
         .then((res) => {
           if (res.ok) {
             const copy = res.clone();
-            caches.open(CACHE).then((cache) => cache.put(request, copy));
+            caches.open(CACHE).then((cache) => cache.put('./', copy));
           }
           return res;
         })
-        .catch(() => (request.mode === 'navigate' ? caches.match('./') : Response.error()));
+        .catch(() => caches.match('./')),
+    );
+    return;
+  }
+  event.respondWith(
+    caches.match(request, { ignoreSearch: true }).then((hit) => {
+      if (hit) return hit;
+      return fetch(request).then((res) => {
+        if (res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE).then((cache) => cache.put(request, copy));
+        }
+        return res;
+      });
     }),
   );
 });
