@@ -1,0 +1,18 @@
+export default [
+  ['Pool party', '🏊', '🏊 Pool|🦩 Flamingo float|🍹 Cocktails|🎵 DJ|🛝 Waterslide|🍖 BBQ|🔫 Water guns|🍉 Watermelon|🏐 Volleyball|🧊 Ice bucket|💡 Pool lights|🌴 Palm trees|🍕 Pizza|🥤 Cooler|🩴 Lost flip-flop|🧴 Sunscreen only|☔ Rain'],
+  ['House party', '🎉', '🎵 DJ|💡 Disco lights|🍺 Keg|🍕 Pizza|🎤 Karaoke|🏓 Beer pong|🍸 Cocktail bar|🔊 Speakers|🛋️ Big couch|📸 Photo booth|🎈 Balloons|🍟 Snacks|🧹 Cleanup crew|🔒 Locked bedroom|🐈 Angry cat|🤮 Someone\'s sick|🚓 Noise complaint'],
+  ['Girls\' night', '💅', '🍷 Rosé|🍕 Pizza|🎬 Rom-com|💅 Nail kit|🧖 Face masks|🍫 Chocolate|🛋️ Pillow fort|🎤 Karaoke|🍿 Popcorn|💃 Dance playlist|🍸 Cocktails|🔮 Tarot cards|🍰 Cake|🕯️ Candles|☕ Tea|📱 Ex\'s Instagram|😴 Early bedtime'],
+  ['Cocktail', '🍹', '🍸 Vodka|🥃 Rum|🍾 Gin|🍊 Triple sec|🍋 Lime|🍓 Strawberry|🍍 Pineapple|🥥 Coconut|🌿 Mint|🧊 Crushed ice|🍯 Syrup|🍒 Cherry|☂️ Tiny umbrella|🫧 Soda water|🧂 Salt rim|🥛 Milk|🥒 Pickle juice'],
+  ['Birthday party', '🎈', '🎂 Big cake|🎈 Balloons|🎁 Presents|🎉 Confetti|🍕 Pizza|🏰 Bouncy castle|🎤 Karaoke|🎆 Fireworks|🎵 DJ|🍭 Candy table|📸 Photo booth|🧙 Magician|🍹 Punch|🥳 Party hats|🎲 Party games|🤡 Clown|😢 Nobody shows up'],
+  ['Boys\' night', '🍻', '🍺 Craft beer|🎯 Darts|🎮 PS5|📺 Football on TV|🍗 Wings|🃏 Poker|🍕 Pizza|🥃 Whiskey|🎱 Pool table|🌶️ Hot sauces|🔥 BBQ|🏓 Ping pong|🍔 Burgers|🥗 Salad|🕯️ Scented candles|📚 Book club|🧶 Knitting'],
+  ['Bachelor(ette) party', '🥂', '🍾 Champagne|🏨 Hotel suite|🛥️ Boat party|🎰 Casino|💃 Club VIP|🍸 Cocktails|🎤 Karaoke|🧖 Spa day|🍣 Fancy dinner|🚌 Party bus|🎉 Sashes|📸 Photographer|🎲 Dares|🩱 Pool day|🤢 Hangover|📞 Call from mum|🚔 Police'],
+  ['Festival weekend', '🎪', '🎟️ VIP ticket|⛺ Glamping|🎵 Headliner|🍔 Food trucks|🍺 Beer|🌈 Glitter|🎆 Fireworks|🎡 Ferris wheel|🎧 Silent disco|🔋 Power bank|🌞 Sunshine|🧥 Rain poncho|🥾 Wellies|🧻 Toilet roll|🚽 Portaloo|🌧️ Mud bath|📱 Lost phone'],
+  ['Drinking games', '🍺', '🏓 Beer pong|🃏 Ring of fire|🍺 Flip cup|🎲 Dice|🙊 Never have I ever|🃏 Kings cup|🥃 Shot glasses|🎵 Music game|🪙 Quarters|🍾 Spin the bottle|📺 Drinking movie|🎰 Shot roulette|🧃 Juice|💧 Water|🥛 Milk|🥴 Lightweight|🛑 Party pooper'],
+  ['Rooftop party', '🌃', '🌃 Skyline|💡 Fairy lights|🍸 Cocktail bar|🎵 DJ|🔥 Fire pit|🛋️ Lounge|🍣 Sushi|🍾 Champagne|🎆 Fireworks|📸 Photographer|🌙 Full moon|🔭 Telescope|🌬️ Gale-force wind|🐦 Pigeons|🛗 Broken elevator|🌧️ Drizzle|📢 Angry neighbours'],
+  ['Beach party', '🏖️', '🔥 Bonfire|🎵 Speakers|🍹 Cocktails|🏐 Volleyball|🍉 Watermelon|🌅 Sunset|🏄 Surfboards|🍖 BBQ|💡 Lanterns|🎸 Guitar|🛶 Kayaks|🥥 Coconuts|🧊 Cooler|🦀 Crabs|🌊 High tide|🪼 Jellyfish|🏖️ Sand in the food'],
+  ['Prom night', '🕺', '👗 Dream dress|🤵 Tux|🚗 Limo|💐 Corsage|👑 Prom crown|📸 Photos|🎵 DJ|🪩 Disco ball|💃 Slow dance|🍫 Chocolate fountain|🍕 After-party|💄 Makeup artist|🎉 Confetti|🕶️ Chaperones|🤢 Spiked punch|📱 Embarrassing video|💔 Getting dumped'],
+  ['Halloween party', '🎃', '🎃 Pumpkins|👻 Ghost decor|🍬 Candy bowl|🧟 Zombie costume|🧪 Potion punch|🌫️ Fog machine|🎬 Horror movies|🕸️ Spider webs|🦇 Bats|💀 Skeleton|🍎 Apple bobbing|🕯️ Candles|🧙 Witch hat|🦷 Fake fangs|🍬 Raisins|🪥 Toothbrushes|🔦 Dead torch'],
+  ['Christmas morning', '🎄', '🎄 Big tree|🎁 Presents|🧦 Stockings|🍪 Cookies|🔥 Fireplace|☃️ Snowman|🍫 Advent chocolates|🍷 Mulled wine|🎅 Santa visit|🦌 Reindeer|🎶 Carols|🥛 Milk|🧣 Itchy jumper|🧦 Just socks|🔋 No batteries|🪨 Coal|🍽️ Burnt turkey'],
+  ['New Year\'s Eve', '🎆', '🎆 Fireworks|🍾 Champagne|💋 Midnight kiss|🎵 DJ|🪩 Disco ball|🌃 City view|🎉 Confetti|🕛 Countdown|🎩 Party hats|🍕 Late-night pizza|📸 Photos|🥂 Bubbly|🚕 Surge pricing|🚇 Missed last train|🔊 Way too loud|🤧 Flu|🛌 Asleep at 11'],
+  ['Movie night', '🎬', '📽️ Projector|🍿 Popcorn|🛋️ Bean bags|🍫 Candy|🥤 Soda|📺 4K TV|🔊 Surround sound|🍕 Pizza|🧸 Blankets|🎞️ Classics|😱 Horror film|💕 Rom-com|🌌 Star lights|🍦 Ice cream|📱 Phone ringing|🛑 Buffering|😴 Snorer'],
+];
