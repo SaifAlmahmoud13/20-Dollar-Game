@@ -44,6 +44,10 @@ npm run build    # static site in dist/
 
 `dist/` is a static site and can be hosted anywhere (Netlify, Vercel, GitHub Pages, …).
 
+`npm run build:artifact` builds a version for a claude.ai Artifact in `dist-artifact/`: one page with the JS and
+CSS inlined, plus `themes/*.webp` published alongside it. Artifacts can't reach the Anthropic API, so this build
+hides the AI judge and AI themes (players vote, and custom themes are written by hand).
+
 ## Project layout
 
 ```

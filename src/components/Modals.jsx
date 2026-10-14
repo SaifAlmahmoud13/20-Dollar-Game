@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Modal } from './ui.jsx';
-import { generateTheme, AIError } from '../ai/index.js';
+import { generateTheme, AIError, AI_ENABLED } from '../ai/index.js';
 import { PHOTO_CREDITS, THEMES_BY_ID } from '../data/index.js';
 
 export function HelpModal({ onClose }) {
@@ -11,7 +11,10 @@ export function HelpModal({ onClose }) {
         <li>A theme is revealed, like <b>Pirate ship</b> or <b>Demon Slayer squad</b>. Your goal: build the best one.</li>
         <li>Items come up one at a time. Shout your bids! The auctioneer raises the price and taps <b>Sold</b> next to the highest bidder.</li>
         <li>Everyone has the same number of slots. Once yours are full you are out of the bidding, and if only one player has room left, they get the rest for free.</li>
-        <li>When all items are gone, compare boards. Let the AI judge roast you all, or vote on who built it better.</li>
+        <li>
+          When all items are gone, compare boards.{' '}
+          {AI_ENABLED ? 'Let the AI judge roast you all, or vote on who built it better.' : 'Vote on who built it better.'}
+        </li>
       </ol>
       <p className="muted">Tip: hype up the bad items so your friends overpay for them.</p>
       {PHOTO_CREDITS.length > 0 && (
@@ -85,7 +88,7 @@ function parseManualItems(text) {
 }
 
 export function CreateThemeModal({ apiKey, onNeedKey, onCreate, onClose }) {
-  const [tab, setTab] = useState(apiKey ? 'ai' : 'manual');
+  const [tab, setTab] = useState(AI_ENABLED && apiKey ? 'ai' : 'manual');
   const [idea, setIdea] = useState('');
   const [draft, setDraft] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -113,14 +116,16 @@ export function CreateThemeModal({ apiKey, onNeedKey, onCreate, onClose }) {
 
   return (
     <Modal title="Create a theme" onClose={onClose}>
-      <div className="tabs">
-        <button type="button" className={tab === 'ai' ? 'active' : ''} onClick={() => setTab('ai')}>
-          ✨ With AI
-        </button>
-        <button type="button" className={tab === 'manual' ? 'active' : ''} onClick={() => setTab('manual')}>
-          ✍️ Write my own
-        </button>
-      </div>
+      {AI_ENABLED && (
+        <div className="tabs">
+          <button type="button" className={tab === 'ai' ? 'active' : ''} onClick={() => setTab('ai')}>
+            ✨ With AI
+          </button>
+          <button type="button" className={tab === 'manual' ? 'active' : ''} onClick={() => setTab('manual')}>
+            ✍️ Write my own
+          </button>
+        </div>
+      )}
 
       {tab === 'ai' ? (
         <>

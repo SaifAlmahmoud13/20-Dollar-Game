@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
+    "build:artifact": "node scripts/build-artifact.mjs",
     "theme-images": "NODE_USE_ENV_PROXY=1 node scripts/theme-images.mjs"
   },
   "dependencies": {

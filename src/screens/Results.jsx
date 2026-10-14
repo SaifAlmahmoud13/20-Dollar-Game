@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Board from '../components/Board.jsx';
-import { judgeGame, AIError } from '../ai/index.js';
+import { judgeGame, AIError, AI_ENABLED } from '../ai/index.js';
 import { spent } from '../game/logic.js';
 
 const winnersOf = (scores) => {
@@ -12,9 +12,10 @@ export default function Results({
   game, outcome, setOutcome, aiJudge, apiKey, label, wins,
   onRematch, onNewTheme, onChangeThemes, onHome,
 }) {
-  const [mode, setMode] = useState(aiJudge && apiKey ? 'ai' : 'vote');
+  const [mode, setMode] = useState(AI_ENABLED && aiJudge && apiKey ? 'ai' : 'vote');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [shareLabel, setShareLabel] = useState('Share');
 
   async function askJudge() {
     setBusy(true);
@@ -37,14 +38,18 @@ export default function Results({
     });
     const text = [`$20 Challenge: ${game.theme.emoji} ${game.theme.name}`, ...lines, outcome?.verdict].filter(Boolean).join('\n');
     try {
-      if (navigator.share) await navigator.share({ text });
-      else {
-        await navigator.clipboard.writeText(text);
-        alert('Results copied to clipboard');
-      }
-    } catch {
-      // User cancelled the share sheet.
+      await navigator.share({ text });
+      return;
+    } catch (err) {
+      if (err?.name === 'AbortError') return; // user closed the share sheet
     }
+    try {
+      await navigator.clipboard.writeText(text);
+      setShareLabel('Copied!');
+    } catch {
+      setShareLabel("Couldn't copy");
+    }
+    setTimeout(() => setShareLabel('Share'), 2000);
   }
 
   const decided = !!outcome;
@@ -57,7 +62,7 @@ export default function Results({
         </button>
         <span className="kicker">{game.theme.name}</span>
         <button type="button" className="pill-btn" onClick={share}>
-          Share
+          {shareLabel}
         </button>
       </header>
       <div className="content">

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { CATEGORIES } from '../data/index.js';
 import ThemeCard from '../components/ThemeCard.jsx';
 import { TopBar, Toggle, Stepper } from '../components/ui.jsx';
+import { AI_ENABLED } from '../ai/index.js';
 
 export default function Themes({
   allThemes, customThemes, selected, setSelected, settings, setSettings, apiKey,
@@ -30,9 +31,11 @@ export default function Themes({
         title="$20 Challenge"
         right={
           <>
-            <button type="button" className="icon-btn" aria-label="AI settings" onClick={onSettings}>
-              ⚙️
-            </button>
+            {AI_ENABLED && (
+              <button type="button" className="icon-btn" aria-label="AI settings" onClick={onSettings}>
+                ⚙️
+              </button>
+            )}
             <button type="button" className="icon-btn" aria-label="How to play" onClick={onHelp}>
               ?
             </button>
@@ -71,7 +74,7 @@ export default function Themes({
         <div className="theme-grid">
           <button type="button" className="theme-card create-card" onClick={onCreate}>
             <span className="sparkle" aria-hidden="true">✦</span>
-            <span className="theme-card-name">Create with AI</span>
+            <span className="theme-card-name">{AI_ENABLED ? 'Create with AI' : 'Create a theme'}</span>
           </button>
           {category.themes.map((t) => (
             <ThemeCard
@@ -85,12 +88,14 @@ export default function Themes({
         </div>
       </div>
       <div className="footer panel">
-        <div className="setting-card">
-          <div className="setting-row">
-            <span>AI judge</span>
-            <Toggle label="AI judge" checked={settings.aiJudge && !!apiKey} onChange={setJudge} />
+        {AI_ENABLED && (
+          <div className="setting-card">
+            <div className="setting-row">
+              <span>AI judge</span>
+              <Toggle label="AI judge" checked={settings.aiJudge && !!apiKey} onChange={setJudge} />
+            </div>
           </div>
-        </div>
+        )}
         <button type="button" className="advanced-toggle" aria-expanded={advanced} onClick={() => setAdvanced(!advanced)}>
           Advanced options <span className={`chev ${advanced ? 'up' : ''}`}>⌄</span>
         </button>

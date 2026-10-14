@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { TopBar } from '../components/ui.jsx';
+import { Modal, TopBar } from '../components/ui.jsx';
 import { canBuy, currentItem, forcedWinner, maxBid, sell } from '../game/logic.js';
 
 export default function Auction({ game, onSell, onUndo, canUndo, onQuit }) {
@@ -8,13 +8,14 @@ export default function Auction({ game, onSell, onUndo, canUndo, onQuit }) {
   const [price, setPrice] = useState(Math.min(1, ceiling));
   useEffect(() => setPrice(Math.min(1, ceiling)), [game.index, ceiling]);
 
+  const [confirmQuit, setConfirmQuit] = useState(false);
   const forced = forcedWinner(game);
   const bump = (d) => setPrice((p) => Math.max(0, Math.min(ceiling, p + d)));
 
   return (
     <div className="screen auction">
       <TopBar
-        onBack={onQuit}
+        onBack={() => (game.index > 0 ? setConfirmQuit(true) : onQuit())}
         title={game.theme.name}
         right={
           <button type="button" className="icon-btn" aria-label="Undo last sale" disabled={!canUndo} onClick={onUndo}>
@@ -89,6 +90,19 @@ export default function Auction({ game, onSell, onUndo, canUndo, onQuit }) {
           })}
         </ul>
       </div>
+      {confirmQuit && (
+        <Modal title="Quit this auction?" onClose={() => setConfirmQuit(false)}>
+          <p className="muted">Everything bought so far will be lost.</p>
+          <div className="row-buttons">
+            <button type="button" className="btn btn-ghost" onClick={() => setConfirmQuit(false)}>
+              Keep playing
+            </button>
+            <button type="button" className="btn btn-primary" onClick={onQuit}>
+              Quit
+            </button>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

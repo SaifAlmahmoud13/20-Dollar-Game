@@ -90,10 +90,6 @@ export default function App() {
     setSelected(selected.filter((x) => x !== id));
   }
 
-  function quitGame() {
-    if (screen === 'auction' && game.index > 0 && !confirm('Quit this auction? Progress will be lost.')) return;
-    setScreen('themes');
-  }
 
   let view;
   switch (screen) {
@@ -134,7 +130,7 @@ export default function App() {
       );
       break;
     case 'auction':
-      view = <Auction game={game} onSell={handleSell} onUndo={undo} canUndo={history.length > 0} onQuit={quitGame} />;
+      view = <Auction game={game} onSell={handleSell} onUndo={undo} canUndo={history.length > 0} onQuit={() => setScreen('themes')} />;
       break;
     case 'results':
       view = (
