@@ -92,3 +92,31 @@ describe('money helpers', () => {
     expect(maxBid(g)).toBe(1_000_000);
   });
 });
+
+describe('offline judge', () => {
+  it('scores must-haves above duds and names the winner', async () => {
+    const { localJudge, itemQuality } = await import('./judge.js');
+    const pizza = THEMES_BY_ID['pizza'];
+    expect(itemQuality(pizza, 'Fresh mozzarella')).toBeGreaterThan(9);
+    expect(itemQuality(pizza, 'Ketchup base')).toBeLessThan(2);
+    const item = (name, price) => ({ ...pizza.items.find((it) => it.name === name), price });
+    const game = {
+      theme: pizza,
+      budget: 20,
+      slots: 2,
+      players: [
+        { name: 'Ana', money: 10, items: [item('Fresh mozzarella', 6), item('Pepperoni', 4)] },
+        { name: 'Ben', money: 12, items: [item('Raw egg', 5), item('Ketchup base', 3)] },
+      ],
+    };
+    const { scores, verdict } = localJudge(game);
+    expect(scores[0]).toBeGreaterThan(scores[1]);
+    expect(verdict).toContain('Ana');
+    expect(verdict).toMatch(/Ben/);
+    expect(localJudge(game).verdict).toBe(verdict); // same game, same verdict
+  });
+
+  it('every theme has fewer duds than items', () => {
+    for (const t of ALL_THEMES) expect(t.duds, t.name).toBeLessThan(t.items.length - 6);
+  });
+});

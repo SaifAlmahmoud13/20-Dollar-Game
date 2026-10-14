@@ -189,7 +189,7 @@ export function CreateThemeModal({ apiKey, onNeedKey, onCreate, onClose }) {
             </label>
           </div>
           <label className="field">
-            <span>Items, one per line (at least 8). Start a line with an emoji to use it.</span>
+            <span>Items, one per line (at least 8), best first. Start a line with an emoji to use it.</span>
             <textarea
               rows={8}
               value={itemsText}

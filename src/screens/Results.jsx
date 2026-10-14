@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Board from '../components/Board.jsx';
-import { judgeGame, AIError, AI_ENABLED, NEEDS_KEY } from '../ai/index.js';
+import { judgeGame, aiJudgeReady } from '../ai/index.js';
+import { localJudge } from '../game/judge.js';
 import { spent } from '../game/logic.js';
 import { money } from '../lib/format.js';
 
@@ -13,22 +14,32 @@ export default function Results({
   game, outcome, setOutcome, aiJudge, apiKey, label, wins,
   onRematch, onNewTheme, onChangeThemes, onHome,
 }) {
-  const [mode, setMode] = useState(AI_ENABLED && aiJudge && (!NEEDS_KEY || apiKey) ? 'ai' : 'vote');
+  const [mode, setMode] = useState(aiJudge ? 'ai' : 'vote');
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
+  const [note, setNote] = useState('');
   const [shareLabel, setShareLabel] = useState('Share');
 
+  // The AI judge whenever there's internet; the offline judge when there isn't
+  // (or if Claude can't be reached), so there is always a verdict.
   async function askJudge() {
     setBusy(true);
-    setError('');
-    try {
-      const { scores, verdict } = await judgeGame(apiKey, game, label);
-      setOutcome({ scores, verdict, winners: winnersOf(scores) });
-    } catch (err) {
-      setError(err instanceof AIError ? err.message : 'The judge fell asleep. Try again.');
-    } finally {
-      setBusy(false);
+    setNote('');
+    let result = null;
+    let source = 'ai';
+    if (aiJudgeReady(apiKey)) {
+      try {
+        result = await judgeGame(apiKey, game, label);
+      } catch {
+        setNote('Claude couldn’t be reached, so the offline judge scored this one.');
+      }
     }
+    if (!result) {
+      source = 'offline';
+      await new Promise((r) => setTimeout(r, 1200)); // a moment of suspense
+      result = localJudge(game);
+    }
+    setOutcome({ ...result, source, winners: winnersOf(result.scores) });
+    setBusy(false);
   }
 
   async function share() {
@@ -74,7 +85,9 @@ export default function Results({
           <div className="judge-card">
             <div className="judge-head">
               <span className="orb" aria-hidden="true" />
-              <span className="kicker">{outcome?.verdict ? 'AI-generated' : 'AI judge'}</span>
+              <span className="kicker">
+                {outcome?.verdict ? (outcome.source === 'offline' ? 'Offline judge' : 'AI-generated') : 'Judge'}
+              </span>
             </div>
             {outcome?.verdict ? (
               <p className="verdict">{outcome.verdict}</p>
@@ -85,7 +98,7 @@ export default function Results({
             ) : (
               <p className="muted">Ready when you are. The judge scores every build out of 10.</p>
             )}
-            {error && <p className="error">{error}</p>}
+            {note && <p className="muted judge-note">{note}</p>}
           </div>
         )}
 
@@ -117,7 +130,7 @@ export default function Results({
         {!decided && mode === 'ai' && (
           <>
             <button type="button" className="btn btn-primary" disabled={busy} onClick={askJudge}>
-              {busy ? 'Judging…' : error ? 'Try again' : 'Who won?'}
+              {busy ? 'Judging…' : 'Who won?'}
             </button>
             <button type="button" className="link" onClick={() => setMode('vote')}>
               We'll decide ourselves

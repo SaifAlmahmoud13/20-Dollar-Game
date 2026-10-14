@@ -5,6 +5,7 @@ import sports from './themes/sports.js';
 import heroes from './themes/heroes.js';
 import adventure from './themes/adventure.js';
 import IMAGES from './theme-images.js';
+import DUDS, { DEFAULT_DUDS } from './duds.js';
 
 // Vite sets BASE_URL; plain Node (tests, scripts) has no import.meta.env.
 const BASE = import.meta.env?.BASE_URL ?? '/';
@@ -33,6 +34,7 @@ const build = (category, rows) =>
     emoji,
     category,
     items: parseItems(items),
+    duds: DUDS[slugify(name)] ?? DEFAULT_DUDS,
     image: IMAGES[slugify(name)] ? `${BASE}themes/${slugify(name)}.webp` : null,
   }));
 

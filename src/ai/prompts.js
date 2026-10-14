@@ -7,7 +7,8 @@ export const THEME_INSTRUCTIONS =
   'You design themes for the "$20 Challenge", a party auction game. Players get a small budget, ' +
   'items for a theme are auctioned one by one, and everyone tries to build the best version of the theme. ' +
   'Good item lists mix about 6 must-have star items, 6 decent ones and 6 funny duds people will be stuck with. ' +
-  'Items are concrete things, people or characters that fit the theme. Keep names short and recognisable.';
+  'Items are concrete things, people or characters that fit the theme. Keep names short and recognisable. ' +
+  'List the items from best to worst, with the 6 duds last.';
 
 export const themeRequest = (idea) => `Create a theme for: ${idea}\n\nReturn exactly 18 items, each with one fitting emoji.`;
 
@@ -30,7 +31,9 @@ export function cleanTheme(out, idea) {
     .filter((i) => i?.name && i?.emoji)
     .map((i) => ({ name: String(i.name).trim(), emoji: [...String(i.emoji).trim()].slice(0, 4).join('') || '⭐' }));
   if (items.length < 8) throw new AIError('Not enough items came back. Try again.');
-  return { name: String(out.name ?? '').trim() || idea, emoji: String(out.emoji ?? '').trim() || '✨', items };
+  // The prompt asks for the 6 duds last; the offline judge relies on that order.
+  const duds = items.length >= 12 ? 6 : 0;
+  return { name: String(out.name ?? '').trim() || idea, emoji: String(out.emoji ?? '').trim() || '✨', items, duds };
 }
 
 export function cleanJudgement(out, game) {

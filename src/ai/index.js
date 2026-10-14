@@ -17,3 +17,8 @@ const provider = async () => (MODE === 'viewer' ? viewer : import('./claude.js')
 
 export const generateTheme = async (...args) => (await provider()).generateTheme(...args);
 export const judgeGame = async (...args) => (await provider()).judgeGame(...args);
+
+// Whether the real AI judge can be tried right now: there's internet, and (for the
+// API-key version) a key. Otherwise the game uses its offline judge.
+export const aiJudgeReady = (apiKey) =>
+  AI_ENABLED && (!NEEDS_KEY || !!apiKey) && (typeof navigator === 'undefined' || navigator.onLine !== false);

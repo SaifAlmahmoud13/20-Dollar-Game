@@ -475,6 +475,13 @@ a {
   color: #c9c9cf;
 }
 
+.setting-note {
+  margin: 0;
+  padding: 0 18px 14px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
 .advanced-toggle {
   color: var(--muted);
   font-size: 1.05rem;
@@ -1095,6 +1102,11 @@ a {
   border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, #ffd27a, #e070d8 55%, #7b6cff);
   box-shadow: 0 0 12px rgba(224, 112, 216, 0.6);
+}
+
+.judge-note {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
 }
 
 .verdict {

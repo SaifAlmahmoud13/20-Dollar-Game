@@ -22,7 +22,6 @@ export default function Themes({
   const toggle = (id) => setSelected(chosen.has(id) ? selected.filter((x) => x !== id) : [...selected, id]);
   const allSelected = count === allThemes.length;
   const setJudge = (on) => {
-    if (on && NEEDS_KEY && !apiKey) onSettings();
     setSettings({ ...settings, aiJudge: on });
   };
 
@@ -101,14 +100,17 @@ export default function Themes({
         </div>
       </div>
       <div className="footer panel">
-        {AI_ENABLED && (
-          <div className="setting-card">
-            <div className="setting-row">
-              <span>AI judge</span>
-              <Toggle label="AI judge" checked={settings.aiJudge && (!NEEDS_KEY || !!apiKey)} onChange={setJudge} />
-            </div>
+        <div className="setting-card">
+          <div className="setting-row">
+            <span>AI judge</span>
+            <Toggle label="AI judge" checked={!!settings.aiJudge} onChange={setJudge} />
           </div>
-        )}
+          {settings.aiJudge && NEEDS_KEY && !apiKey && (
+            <p className="setting-note">
+              Using the offline judge. To use Claude when you have internet, add an API key in ⚙️.
+            </p>
+          )}
+        </div>
         <button type="button" className="advanced-toggle" aria-expanded={advanced} onClick={() => setAdvanced(!advanced)}>
           Advanced options <span className={`chev ${advanced ? 'up' : ''}`}>⌄</span>
         </button>
