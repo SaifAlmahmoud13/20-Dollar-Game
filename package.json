@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "theme-images": "node scripts/theme-images.mjs"
+    "theme-images": "NODE_USE_ENV_PROXY=1 node scripts/theme-images.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
