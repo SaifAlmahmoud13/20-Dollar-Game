@@ -5,7 +5,14 @@
 import { AIError } from './errors.js';
 import { JUDGE_INSTRUCTIONS, THEME_INSTRUCTIONS, cleanJudgement, cleanTheme, judgeRequest, themeRequest } from './prompts.js';
 
-const ENDPOINT = 'https://text.pollinations.ai/openai';
+const ORIGIN = 'https://text.pollinations.ai';
+const ENDPOINT = `${ORIGIN}/openai`;
+
+// Open the connection early (DNS + TLS) so the judge's request starts straight away.
+// Called while the last item is being auctioned; the reply is ignored.
+export function warmUp() {
+  fetch(`${ORIGIN}/models`, { mode: 'no-cors', cache: 'no-store' }).catch(() => {});
+}
 
 // Pull one JSON object out of a reply, even if the model wrapped it in a sentence or code fence.
 function parseJSON(text) {
@@ -19,7 +26,7 @@ function parseJSON(text) {
   }
 }
 
-async function askJSON(instructions, prompt, format) {
+async function askJSON(instructions, prompt, format, maxTokens) {
   const ctl = new AbortController();
   // Free and shared, so it can be slow: give up after 20 s and let the offline judge answer.
   const timer = setTimeout(() => ctl.abort(), 20000);
@@ -35,6 +42,7 @@ async function askJSON(instructions, prompt, format) {
           { role: 'user', content: prompt },
         ],
         response_format: { type: 'json_object' },
+        max_tokens: maxTokens, // short answers come back faster
         referrer: '20-dollar-game',
       }),
     });
@@ -55,6 +63,7 @@ export async function generateTheme(_apiKey, idea) {
     THEME_INSTRUCTIONS,
     themeRequest(idea),
     '{"name": "Pirate ship", "emoji": "🏴‍☠️", "items": [{"name": "Cannons", "emoji": "💣"}]}.',
+    900,
   );
   return cleanTheme(out, idea);
 }
@@ -62,8 +71,9 @@ export async function generateTheme(_apiKey, idea) {
 export async function judgeGame(_apiKey, game, label = 'Player') {
   const out = await askJSON(
     JUDGE_INSTRUCTIONS,
-    `${judgeRequest(game, label)}\n\nGive every player number a score from 0.0 to 10.0.`,
-    '{"scores": [{"player": 1, "score": 7.5}], "verdict": "2-3 punchy sentences"}.',
+    `${judgeRequest(game, label)}\n\nScore every player number from 0.0 to 10.0. Keep the verdict to 2 short sentences.`,
+    '{"scores": [{"player": 1, "score": 7.5}], "verdict": "2 short punchy sentences"}.',
+    250,
   );
   return cleanJudgement(out, game);
 }

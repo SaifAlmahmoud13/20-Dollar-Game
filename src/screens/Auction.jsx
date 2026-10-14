@@ -3,8 +3,9 @@ import { Modal, NumberInput, TopBar } from '../components/ui.jsx';
 import { canBuy, currentItem, forcedWinner, maxBid, sell } from '../game/logic.js';
 import { MAX_BUDGET, money, shortMoney } from '../lib/format.js';
 import { sfx } from '../lib/sound.js';
+import { warmUpAI } from '../ai/index.js';
 
-export default function Auction({ game, onSell, onUndo, canUndo, onQuit, bidStep, onBidStep }) {
+export default function Auction({ game, onSell, onUndo, canUndo, onQuit, bidStep, onBidStep, aiJudge }) {
   const item = currentItem(game);
   const ceiling = maxBid(game);
   // The players choose how far the bid buttons move ($1 unless changed); each item opens at one step.
@@ -15,6 +16,11 @@ export default function Auction({ game, onSell, onUndo, canUndo, onQuit, bidStep
 
   const [confirmQuit, setConfirmQuit] = useState(false);
   useEffect(() => sfx.preload(), []);
+  // On the last item, connect to the AI so the judge can start the instant the auction ends.
+  const lastItem = game.index === game.queue.length - 1;
+  useEffect(() => {
+    if (aiJudge && lastItem) warmUpAI();
+  }, [aiJudge, lastItem]);
   const forced = forcedWinner(game);
   const bump = (d) => {
     (d > 0 ? sfx.bidUp : sfx.bidDown)();

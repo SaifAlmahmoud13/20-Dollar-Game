@@ -51,8 +51,6 @@ export default function Results({
     finish(localJudge(game), 'offline');
   }
 
-  const skipToOffline = () => finish(localJudge(game), 'offline');
-
   async function share() {
     const lines = game.players.map((p, i) => {
       const score = outcome?.scores ? ` ${outcome.scores[i]}/10` : '';
@@ -143,11 +141,7 @@ export default function Results({
             <button type="button" className="btn btn-primary" disabled={busy} onClick={askJudge}>
               {busy ? 'Judging…' : 'Who won?'}
             </button>
-            {busy && (
-              <button type="button" className="link" onClick={skipToOffline}>
-                Skip, use the offline judge
-              </button>
-            )}
+
             <button type="button" className="link" onClick={() => setMode('vote')}>
               We'll decide ourselves
             </button>

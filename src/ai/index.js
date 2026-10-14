@@ -26,3 +26,8 @@ export const judgeGame = async (...args) => (await provider()).judgeGame(...args
 // version, a key). Otherwise the game uses its offline judge.
 export const aiJudgeReady = (apiKey) =>
   AI_ENABLED && (!NEEDS_KEY || !!apiKey) && (typeof navigator === 'undefined' || navigator.onLine !== false);
+
+// Get the AI connection ready before judging (only the free service needs it).
+export const warmUpAI = () => {
+  if (MODE === 'free' && typeof navigator !== 'undefined' && navigator.onLine !== false) free.warmUp();
+};

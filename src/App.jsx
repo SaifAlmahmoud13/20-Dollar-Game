@@ -147,6 +147,7 @@ export default function App() {
           onUndo={undo}
           canUndo={history.length > 0}
           onQuit={() => setScreen('themes')}
+          aiJudge={!!settings.aiJudge}
           bidStep={settings.bidStep ?? 1}
           onBidStep={(bidStep) => setSettings({ ...settings, bidStep })}
         />
