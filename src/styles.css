@@ -1428,73 +1428,6 @@ a {
   font-size: 1rem;
 }
 
-/* Home: the bidders on the left, the pitch on the right. */
-.app.landscape .home {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr auto;
-}
-
-.app.landscape .hero {
-  grid-row: 1 / span 2;
-  height: auto;
-  min-height: 0;
-}
-
-.app.landscape .face {
-  font-size: clamp(3.5rem, 24cqh, 7rem);
-}
-
-.app.landscape .paddle {
-  font-size: clamp(1.8rem, 10cqh, 3rem);
-}
-
-.app.landscape .home-copy {
-  align-self: end;
-  padding-top: 16px;
-}
-
-.app.landscape .home-copy p {
-  font-size: 1rem;
-}
-
-/* Theme picker: themes on the left, settings and Start on the right. */
-.app.landscape .themes {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
-  grid-template-rows: auto minmax(0, 1fr);
-}
-
-.app.landscape .themes .topbar {
-  grid-column: 1 / -1;
-}
-
-.app.landscape .themes .content {
-  overflow-y: auto;
-  min-height: 0;
-}
-
-.app.landscape .themes .footer.panel {
-  position: static;
-  overflow-y: auto;
-  min-height: 0;
-  border-top: 0;
-  border-left: 1px solid #111;
-  justify-content: flex-end;
-}
-
-.app.landscape .theme-grid {
-  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
-}
-
-.app.landscape .theme-card-emoji {
-  font-size: 2.6rem;
-}
-
-.app.landscape .theme-card-name {
-  font-size: 0.85rem;
-}
-
 /* Reveal: the theme card beside its buttons. */
 .app.landscape .reveal {
   display: grid;
@@ -1531,22 +1464,6 @@ a {
   position: static;
   justify-content: center;
   background: none;
-}
-
-/* Players and other single-column screens stay a readable width. */
-.app.landscape .screen:not(.home):not(.themes):not(.reveal):not(.auction):not(.results) .content,
-.app.landscape .screen:not(.home):not(.themes):not(.reveal):not(.auction):not(.results) .footer {
-  width: 100%;
-  max-width: 640px;
-  margin: 0 auto;
-}
-
-.app.landscape .big-title {
-  font-size: 1.8rem;
-}
-
-.app.landscape .title-row {
-  margin: 4px 0 12px;
 }
 
 @media (prefers-reduced-motion: reduce) {

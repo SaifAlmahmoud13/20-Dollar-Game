@@ -37,7 +37,9 @@ export default function App() {
   const [modal, setModal] = useState(null);
 
   useEffect(() => setSoundEnabled(settings.sound !== false), [settings.sound]);
-  const layout = useOrientation(settings.orientation !== 'portrait');
+  // Menus are upright; the game itself (reveal, auction, results) is landscape unless
+  // Portrait mode is on.
+  const layout = useOrientation(IN_GAME.includes(screen) && settings.orientation !== 'portrait');
 
   useEffect(() => {
     save('session', IN_GAME.includes(screen) ? { screen, theme, game, history, outcome, wins } : undefined);

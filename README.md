@@ -93,8 +93,9 @@ the theme (grass for Theme park, a basement for Boys' night, a ship's deck for O
 
 ### Landscape and portrait
 
-The game is landscape by default; **Portrait mode** under Advanced options switches it. On a phone held the other
-way, the game asks the screen to turn and, if it can't, rotates its own view (`src/lib/layout.js`).
+The menus are portrait; the game itself (theme reveal, auction, results) is landscape unless **Portrait mode** is on
+under Advanced options. On a phone held the other way, the game asks the screen to turn and, if it can't, rotates its
+own view (`src/lib/layout.js`).
 
 ### Adding a theme
 

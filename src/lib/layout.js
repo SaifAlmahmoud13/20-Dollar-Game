@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 
-// Landscape (the default) or portrait, chosen under Advanced options.
-// Phones get the chosen layout whichever way they're held: if the screen won't turn,
+// The game screens are landscape (unless Portrait mode is on); the menus are portrait.
+// Phones get the right layout whichever way they're held: if the screen won't turn,
 // the game turns its own view 90 degrees (like the original app), so players just
 // hold the phone sideways.
 export const LayoutContext = createContext({ landscape: false });
