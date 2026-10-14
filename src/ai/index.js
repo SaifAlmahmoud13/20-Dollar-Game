@@ -12,6 +12,7 @@ import * as free from './free.js';
 export { AIError } from './errors.js';
 
 const MODE = import.meta.env?.VITE_AI ?? 'free';
+export const AI_MODE = MODE;
 
 export const AI_ENABLED = MODE !== 'off';
 export const NEEDS_KEY = MODE === 'api';

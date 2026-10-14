@@ -21,7 +21,8 @@ function parseJSON(text) {
 
 async function askJSON(instructions, prompt, format) {
   const ctl = new AbortController();
-  const timer = setTimeout(() => ctl.abort(), 45000);
+  // Free and shared, so it can be slow: give up after 20 s and let the offline judge answer.
+  const timer = setTimeout(() => ctl.abort(), 20000);
   try {
     const res = await fetch(ENDPOINT, {
       method: 'POST',

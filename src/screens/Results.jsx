@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Board from '../components/Board.jsx';
-import { judgeGame, aiJudgeReady } from '../ai/index.js';
+import { AI_MODE, judgeGame, aiJudgeReady } from '../ai/index.js';
 import { localJudge } from '../game/judge.js';
 import { spent } from '../game/logic.js';
 import { money } from '../lib/format.js';
@@ -21,26 +21,37 @@ export default function Results({
 
   // The AI judge whenever there's internet; the offline judge when there isn't
   // (or if the AI can't be reached), so there is always a verdict.
+  // The AI starts as soon as the auction ends (except where it costs the player's own
+  // Claude usage), so the answer is often ready by the time someone taps "Who won?".
+  const aiAnswer = useRef(null);
+  const settled = useRef(!!outcome);
+  const startAI = () => {
+    aiAnswer.current ??= aiJudgeReady(apiKey) ? judgeGame(apiKey, game, label).catch(() => null) : Promise.resolve(null);
+    return aiAnswer.current;
+  };
+  useEffect(() => {
+    if (mode === 'ai' && !outcome && AI_MODE !== 'viewer') startAI();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const finish = (result, source) => {
+    if (settled.current) return;
+    settled.current = true;
+    setOutcome({ ...result, source, winners: winnersOf(result.scores) });
+    setBusy(false);
+  };
+
   async function askJudge() {
     setBusy(true);
     setNote('');
-    let result = null;
-    let source = 'ai';
-    if (aiJudgeReady(apiKey)) {
-      try {
-        result = await judgeGame(apiKey, game, label);
-      } catch {
-        setNote('The AI couldn’t be reached, so the offline judge scored this one.');
-      }
-    }
-    if (!result) {
-      source = 'offline';
-      await new Promise((r) => setTimeout(r, 1200)); // a moment of suspense
-      result = localJudge(game);
-    }
-    setOutcome({ ...result, source, winners: winnersOf(result.scores) });
-    setBusy(false);
+    const tried = aiJudgeReady(apiKey);
+    const result = await startAI();
+    if (result) return finish(result, 'ai');
+    if (tried) setNote('The AI couldn’t be reached, so the offline judge scored this one.');
+    await new Promise((r) => setTimeout(r, 1200)); // a moment of suspense
+    finish(localJudge(game), 'offline');
   }
+
+  const skipToOffline = () => finish(localJudge(game), 'offline');
 
   async function share() {
     const lines = game.players.map((p, i) => {
@@ -132,6 +143,11 @@ export default function Results({
             <button type="button" className="btn btn-primary" disabled={busy} onClick={askJudge}>
               {busy ? 'Judging…' : 'Who won?'}
             </button>
+            {busy && (
+              <button type="button" className="link" onClick={skipToOffline}>
+                Skip, use the offline judge
+              </button>
+            )}
             <button type="button" className="link" onClick={() => setMode('vote')}>
               We'll decide ourselves
             </button>
