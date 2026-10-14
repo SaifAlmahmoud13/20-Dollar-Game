@@ -10,11 +10,12 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const OUT = path.join(ROOT, 'dist-artifact');
 
-// The viewer only lets the page load its own files, so AI features are switched off.
+// The page can't reach the Anthropic API from the viewer, so AI goes through the
+// viewer's own `sample` capability instead (publish with capabilities: {sample: {}}).
 execSync('npx vite build --base ./ --outDir dist-artifact --emptyOutDir', {
   cwd: ROOT,
   stdio: 'inherit',
-  env: { ...process.env, VITE_AI: 'off' },
+  env: { ...process.env, VITE_AI: 'viewer' },
 });
 
 const html = readFileSync(path.join(OUT, 'index.html'), 'utf8');

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Board from '../components/Board.jsx';
-import { judgeGame, AIError, AI_ENABLED } from '../ai/index.js';
+import { judgeGame, AIError, AI_ENABLED, NEEDS_KEY } from '../ai/index.js';
 import { spent } from '../game/logic.js';
 
 const winnersOf = (scores) => {
@@ -12,7 +12,7 @@ export default function Results({
   game, outcome, setOutcome, aiJudge, apiKey, label, wins,
   onRematch, onNewTheme, onChangeThemes, onHome,
 }) {
-  const [mode, setMode] = useState(AI_ENABLED && aiJudge && apiKey ? 'ai' : 'vote');
+  const [mode, setMode] = useState(AI_ENABLED && aiJudge && (!NEEDS_KEY || apiKey) ? 'ai' : 'vote');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [shareLabel, setShareLabel] = useState('Share');

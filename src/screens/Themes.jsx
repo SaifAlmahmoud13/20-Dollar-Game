@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { CATEGORIES } from '../data/index.js';
 import ThemeCard from '../components/ThemeCard.jsx';
 import { TopBar, Toggle, Stepper } from '../components/ui.jsx';
-import { AI_ENABLED } from '../ai/index.js';
+import { AI_ENABLED, NEEDS_KEY } from '../ai/index.js';
 
 export default function Themes({
   allThemes, customThemes, selected, setSelected, settings, setSettings, apiKey,
@@ -20,7 +20,7 @@ export default function Themes({
   const toggle = (id) => setSelected(chosen.has(id) ? selected.filter((x) => x !== id) : [...selected, id]);
   const allSelected = count === allThemes.length;
   const setJudge = (on) => {
-    if (on && !apiKey) onSettings();
+    if (on && NEEDS_KEY && !apiKey) onSettings();
     setSettings({ ...settings, aiJudge: on });
   };
 
@@ -31,7 +31,7 @@ export default function Themes({
         title="$20 Challenge"
         right={
           <>
-            {AI_ENABLED && (
+            {NEEDS_KEY && (
               <button type="button" className="icon-btn" aria-label="AI settings" onClick={onSettings}>
                 ⚙️
               </button>
@@ -92,7 +92,7 @@ export default function Themes({
           <div className="setting-card">
             <div className="setting-row">
               <span>AI judge</span>
-              <Toggle label="AI judge" checked={settings.aiJudge && !!apiKey} onChange={setJudge} />
+              <Toggle label="AI judge" checked={settings.aiJudge && (!NEEDS_KEY || !!apiKey)} onChange={setJudge} />
             </div>
           </div>
         )}

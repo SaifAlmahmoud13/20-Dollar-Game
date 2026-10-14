@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Modal } from './ui.jsx';
-import { generateTheme, AIError, AI_ENABLED } from '../ai/index.js';
+import { generateTheme, AIError, AI_ENABLED, NEEDS_KEY } from '../ai/index.js';
 import { PHOTO_CREDITS, THEMES_BY_ID } from '../data/index.js';
 
 export function HelpModal({ onClose }) {
@@ -88,7 +88,7 @@ function parseManualItems(text) {
 }
 
 export function CreateThemeModal({ apiKey, onNeedKey, onCreate, onClose }) {
-  const [tab, setTab] = useState(AI_ENABLED && apiKey ? 'ai' : 'manual');
+  const [tab, setTab] = useState(AI_ENABLED && (!NEEDS_KEY || apiKey) ? 'ai' : 'manual');
   const [idea, setIdea] = useState('');
   const [draft, setDraft] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -98,7 +98,7 @@ export function CreateThemeModal({ apiKey, onNeedKey, onCreate, onClose }) {
   const [itemsText, setItemsText] = useState('');
 
   async function generate() {
-    if (!apiKey) return onNeedKey();
+    if (NEEDS_KEY && !apiKey) return onNeedKey();
     setBusy(true);
     setError('');
     setDraft(null);
@@ -129,7 +129,7 @@ export function CreateThemeModal({ apiKey, onNeedKey, onCreate, onClose }) {
 
       {tab === 'ai' ? (
         <>
-          {!apiKey && (
+          {NEEDS_KEY && !apiKey && (
             <p className="notice">
               AI themes need an Anthropic API key.{' '}
               <button type="button" className="link" onClick={onNeedKey}>
