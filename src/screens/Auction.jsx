@@ -34,11 +34,41 @@ export default function Auction({ game, onSell, onUndo, canUndo, onQuit, bidStep
     onSell(sell(game, p, at));
   };
 
+  const back = () => (game.index > 0 ? setConfirmQuit(true) : onQuit());
+  const undoButton = (
+    <button
+      type="button"
+      className="icon-btn"
+      aria-label="Undo last sale"
+      disabled={!canUndo}
+      onClick={() => {
+        sfx.undo();
+        onUndo();
+      }}
+    >
+      ↶
+    </button>
+  );
+  const progressLabel = (
+    <p className="progress-label">
+      Item {game.index + 1} of {game.queue.length}
+    </p>
+  );
+
   const controls = (
     <div className="auction-center">
-      <p className="progress-label">
-        Item {game.index + 1} of {game.queue.length}
-      </p>
+      {landscape ? (
+        // Sideways there's no title bar, so the boards get the full height.
+        <div className="auction-nav">
+          <button type="button" className="icon-btn accent" aria-label="Back" onClick={back}>
+            ←
+          </button>
+          {progressLabel}
+          {undoButton}
+        </div>
+      ) : (
+        progressLabel
+      )}
       <div className="progress">
         <span style={{ width: `${(game.index / game.queue.length) * 100}%` }} />
       </div>
@@ -107,24 +137,7 @@ export default function Auction({ game, onSell, onUndo, canUndo, onQuit, bidStep
 
   return (
     <div className="screen auction">
-      <TopBar
-        onBack={() => (game.index > 0 ? setConfirmQuit(true) : onQuit())}
-        title={game.theme.name}
-        right={
-          <button
-            type="button"
-            className="icon-btn"
-            aria-label="Undo last sale"
-            disabled={!canUndo}
-            onClick={() => {
-              sfx.undo();
-              onUndo();
-            }}
-          >
-            ↶
-          </button>
-        }
-      />
+      {!landscape && <TopBar onBack={back} title={game.theme.name} right={undoButton} />}
       {landscape ? (
         <div className="stage">
           <div className="stage-side">{cards.slice(0, half)}</div>
