@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Modal, NumberInput, TopBar } from '../components/ui.jsx';
 import { canBuy, currentItem, forcedWinner, maxBid, sell } from '../game/logic.js';
 import { MAX_BUDGET, money, shortMoney } from '../lib/format.js';
@@ -6,6 +6,7 @@ import { sfx } from '../lib/sound.js';
 import { warmUpAI } from '../ai/index.js';
 import Board, { ItemArt } from '../components/Board.jsx';
 import { useLayout } from '../lib/layout.js';
+import { themeFont } from '../data/fonts.js';
 
 export default function Auction({ game, onSell, onUndo, canUndo, onQuit, bidStep, onBidStep, aiJudge }) {
   const item = currentItem(game);
@@ -58,12 +59,16 @@ export default function Auction({ game, onSell, onUndo, canUndo, onQuit, bidStep
   const controls = (
     <div className="auction-center">
       {landscape ? (
-        // Sideways there's no title bar, so the boards get the full height.
+        // Sideways there's no title bar (so the boards get the full height): the theme name
+        // sits here in the middle, between back and undo.
         <div className="auction-nav">
           <button type="button" className="icon-btn accent" aria-label="Back" onClick={back}>
             ←
           </button>
-          {progressLabel}
+          <div className="auction-heading">
+            <FitTitle font={themeFont(game.theme)}>{game.theme.name}</FitTitle>
+            {progressLabel}
+          </div>
           {undoButton}
         </div>
       ) : (
@@ -137,7 +142,13 @@ export default function Auction({ game, onSell, onUndo, canUndo, onQuit, bidStep
 
   return (
     <div className="screen auction">
-      {!landscape && <TopBar onBack={back} title={game.theme.name} right={undoButton} />}
+      {!landscape && (
+        <TopBar
+          onBack={back}
+          title={<span className="theme-title" style={{ fontFamily: themeFont(game.theme) }}>{game.theme.name}</span>}
+          right={undoButton}
+        />
+      )}
       {landscape ? (
         <div className="stage">
           <div className="stage-side">{cards.slice(0, half)}</div>
@@ -164,5 +175,31 @@ export default function Auction({ game, onSell, onUndo, canUndo, onQuit, bidStep
         </Modal>
       )}
     </div>
+  );
+}
+
+// The theme name on one line, shrinking its font until it fits; very long names wrap.
+function FitTitle({ font, children }) {
+  const ref = useRef(null);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const fit = () => {
+      el.style.whiteSpace = 'nowrap';
+      let size = 23;
+      el.style.fontSize = `${size}px`;
+      while (el.scrollWidth > el.clientWidth && size > 14) el.style.fontSize = `${--size}px`;
+      if (el.scrollWidth > el.clientWidth) el.style.whiteSpace = 'normal';
+    };
+    fit();
+    document.fonts?.ready.then(fit);
+    const ro = new ResizeObserver(fit);
+    ro.observe(el.parentElement);
+    return () => ro.disconnect();
+  }, [font, children]);
+  return (
+    <h1 ref={ref} className="theme-title" style={{ fontFamily: font }}>
+      {children}
+    </h1>
   );
 }

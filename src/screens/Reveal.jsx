@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { themeFont } from '../data/fonts.js';
 import { themeBackground } from '../data/index.js';
 import { TopBar } from '../components/ui.jsx';
 import { money } from '../lib/format.js';
@@ -16,7 +17,9 @@ export default function Reveal({ theme, settings, canShuffle, onShuffle, onGo, o
         <div className={`reveal-card ${theme.image ? 'has-photo' : ''}`} key={theme.id} style={{ background: themeBackground(theme, TITLE_SHADE) }}>
           {!theme.image && <span className="reveal-emoji">{theme.emoji}</span>}
           <span className="reveal-kicker">Build the best</span>
-          <h1>{theme.name}</h1>
+          <h1 className="theme-title" style={{ fontFamily: themeFont(theme) }}>
+            {theme.name}
+          </h1>
         </div>
         <p className="reveal-meta">
           {money(settings.budget)} each · {items} items up for auction

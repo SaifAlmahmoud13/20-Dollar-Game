@@ -1404,6 +1404,35 @@ a {
   margin: 0;
 }
 
+/* A theme's name in its own display font (data/fonts.js). */
+.theme-title {
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+  color: #fff;
+}
+
+.auction-heading {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.auction-heading .theme-title {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  text-wrap: balance;
+}
+
+.auction-heading .progress-label {
+  font-size: 0.8rem;
+}
+
 /* Sideways auction: no title bar; back and undo sit beside the progress label, and each
    board stretches to fill the height of its side. */
 .auction-nav {
