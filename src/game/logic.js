@@ -22,6 +22,7 @@ export function createGame({ names, theme, budget = 20, itemsPerRound = 10, rng 
     queue: shuffle(theme.items, rng).slice(0, count),
     index: 0,
     slots: slotsPerPlayer(count, names.length),
+    starter: Math.floor(rng() * names.length), // who opens the bidding, announced as the auction starts
     players: names.map((name, i) => ({
       name,
       color: PLAYER_COLORS[i % PLAYER_COLORS.length],

@@ -18,6 +18,8 @@ export default function Auction({ game, onSell, onUndo, canUndo, onQuit, bidStep
   useEffect(() => setPrice(Math.min(small, ceiling)), [game.index, ceiling]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [confirmQuit, setConfirmQuit] = useState(false);
+  // Before the first item: announce who opens the bidding (games saved before this have no starter).
+  const [announce, setAnnounce] = useState(() => game.index === 0 && Number.isInteger(game.starter));
   useEffect(() => sfx.preload(), []);
   // On the last item, connect to the AI so the judge can start the instant the auction ends.
   const lastItem = game.index === game.queue.length - 1;
@@ -161,6 +163,7 @@ export default function Auction({ game, onSell, onUndo, canUndo, onQuit, bidStep
           <div className="bidders">{cards}</div>
         </div>
       )}
+      {announce && <StarterReveal players={game.players} starter={game.starter} onDone={() => setAnnounce(false)} />}
       {confirmQuit && (
         <Modal title="Quit this auction?" onClose={() => setConfirmQuit(false)}>
           <p className="muted">Everything bought so far will be lost.</p>
@@ -201,5 +204,45 @@ function FitTitle({ font, children }) {
     <h1 ref={ref} className="theme-title" style={{ fontFamily: font }}>
       {children}
     </h1>
+  );
+}
+
+// Flicks through the players' names like a roulette, then lands on whoever opens the bidding.
+function StarterReveal({ players, starter, onDone }) {
+  const [shown, setShown] = useState(players.length > 1 ? (starter + 1) % players.length : starter);
+  const [landed, setLanded] = useState(players.length < 2);
+  useEffect(() => {
+    if (players.length < 2) return sfx.reveal();
+    const steps = players.length * 3 + ((starter - shown + players.length) % players.length);
+    let step = 0;
+    let timer;
+    const tick = () => {
+      step++;
+      setShown((i) => (i + 1) % players.length);
+      if (step >= steps) {
+        setLanded(true);
+        sfx.reveal();
+        return;
+      }
+      sfx.tap();
+      timer = setTimeout(tick, 60 + (step / steps) ** 2 * 260); // slows down before it stops
+    };
+    timer = setTimeout(tick, 60);
+    return () => clearTimeout(timer);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const p = players[shown];
+  return (
+    <div className="starter-overlay" role="dialog" aria-modal="true" aria-label="Who starts the bidding">
+      <div className="starter-card" style={{ '--player': p.color }}>
+        <p className="starter-kicker">🎲 Who starts the bidding?</p>
+        <p className={`starter-name ${landed ? 'landed' : ''}`} key={landed ? 'landed' : 'spin'}>
+          {p.name}
+        </p>
+        <p className="starter-line">{landed ? `${p.name} makes the first bid!` : '…'}</p>
+        <button type="button" className="btn btn-primary" disabled={!landed} onClick={onDone}>
+          Start bidding
+        </button>
+      </div>
+    </div>
   );
 }

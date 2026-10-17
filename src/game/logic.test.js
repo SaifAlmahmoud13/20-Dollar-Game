@@ -27,6 +27,17 @@ describe('themes', () => {
 });
 
 describe('auction', () => {
+  it('picks a random player to open the bidding', () => {
+    const seen = new Set();
+    for (let i = 0; i < 200; i++) {
+      const g = createGame({ names: ['A', 'B', 'C'], theme });
+      expect(g.starter).toBeGreaterThanOrEqual(0);
+      expect(g.starter).toBeLessThan(3);
+      seen.add(g.starter);
+    }
+    expect(seen.size).toBe(3);
+  });
+
   it('splits slots evenly, rounding up', () => {
     expect(slotsPerPlayer(10, 2)).toBe(5);
     expect(slotsPerPlayer(10, 3)).toBe(4);
